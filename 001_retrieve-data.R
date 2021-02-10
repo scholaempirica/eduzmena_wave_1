@@ -16,6 +16,12 @@ url_id <- googledrive::as_id("https://drive.google.com/file/d/1Jx_ODcogsOfgetFvV
 drib <- googledrive::as_dribble(url_id)
 googledrive::drive_download(drib, paste0("data-input/", drib$name))
 
+# load the megadatabase of all institutions and save separate relevant data
+# (so we do not use too much memory and manipulating the dataset will be faster)
+read_rds(here("data-input/institutions.rds")) %>%
+  filter(orp_nazev %in% c("Kutná Hora", "Semily")) %>%
+  transmute(red_izo = as.character(red_izo), ico, nazev = nazev_1, nazev_simple = nazev_2, druh_zarizeni = typ_izo_nazev) %>%
+  write_rds(here("data-processed/institutions_digest.rds"))
 
 # LimeSurvey API fetch ------------------------------------------------------
 
@@ -33,7 +39,8 @@ sess_key <- lsSessionKey("get") # obtain sesion key
 # list of all questionnares
 lsList() %>% as_tibble %>% view  #filter(str_detect(surveyls_title, "(?i)eduzměna"))
 
-# ucitele
+# Download LS data for Elementary/high school teachers --------------------
+
 # get whole response dataframe
 # first, get rsyntax.R file, then rdata.csv file, then run syntax on rdata
 # has to be neamed "data"

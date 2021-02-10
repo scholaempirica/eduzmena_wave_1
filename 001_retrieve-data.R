@@ -4,12 +4,8 @@ library(here)
 library(LimeRick)
 source("shared.R")
 
-# download all data from GDrive folder set in `shared.R` into `data-input`
-reschola::gd_download_folder(gd_url, overwrite = T, files_from_subfolders = T)
-
-# If there is other data you expect to only retrieve once
-# (from the web, public databases or APIs, etc.),
-# this might be a good place to store the code that does it.
+dir.create("data-input")
+dir.create("data-processed")
 
 # institutions big database (aka "table of everything")
 url_id <- googledrive::as_id("https://drive.google.com/file/d/1Jx_ODcogsOfgetFvVFuyKFisicM1stiP")
@@ -19,7 +15,6 @@ googledrive::drive_download(drib, paste0("data-input/", drib$name))
 # load the megadatabase of all institutions and save separate relevant data
 # (so we do not use too much memory and manipulating the dataset will be faster)
 read_rds(here("data-input/institutions.rds")) %>%
-  filter(orp_nazev %in% c("Kutná Hora", "Semily")) %>%
   transmute(red_izo = as.character(red_izo), ico, nazev = nazev_1, nazev_simple = nazev_2, druh_zarizeni = typ_izo_nazev) %>%
   write_rds(here("data-processed/institutions_digest.rds"))
 

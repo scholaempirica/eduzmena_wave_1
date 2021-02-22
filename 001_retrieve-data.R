@@ -1,53 +1,38 @@
 library(reschola)
 library(tidyverse)
 library(here)
-library(LimeRick)
 source("shared.R")
 
-dir.create("data-input")
-dir.create("data-processed")
+# If there is other data you expect to only retrieve once
+# (from the web, public databases or APIs, etc.),
+# this might be a good place to store the code that does it.
 
 # institutions big database (aka "table of everything")
 url_id <- googledrive::as_id("https://drive.google.com/file/d/1Jx_ODcogsOfgetFvVFuyKFisicM1stiP")
 drib <- googledrive::as_dribble(url_id)
 googledrive::drive_download(drib, paste0("data-input/", drib$name))
 
-# load the megadatabase of all institutions and save separate relevant data
-# (so we do not use too much memory and manipulating the dataset will be faster)
-read_rds(here("data-input/institutions.rds")) %>%
-  transmute(red_izo = as.character(red_izo), ico, nazev = nazev_1, nazev_simple = nazev_2, druh_zarizeni = typ_izo_nazev) %>%
-  write_rds(here("data-processed/institutions_digest.rds"))
-
-# LimeSurvey API fetch ------------------------------------------------------
-
-# fixed and edited fork at my GitHub (main issue is the correct encoding)
-if (!require("LimeRick")) remotes::install_github("netique/LimeRick")
-
-# API calls reference list
-# https://api.limesurvey.org/classes/remotecontrol_handle.html
-
-options(lsAPIurl = limesurvey_api) # our API URL from shared.R
-options(lsUser = ls_cred("user")) # your LS username
-options(lsPass = ls_cred("pass")) # password to your LS account
-sess_key <- lsSessionKey("get") # obtain sesion key
+# fetch from LimeSurvey ------------------------------------------------------
 
 # list of all questionnares
-lsList() %>% as_tibble %>% view  #filter(str_detect(surveyls_title, "(?i)eduzměna"))
+ls_surveys()  #filter(str_detect(surveyls_title, "(?i)eduzměna"))
 
-# Download LS data for Elementary/high school teachers --------------------
+# ucitele
+ls_responses(867277) %>% write_rds(here("data-input/ucitele_ZS_SS_wave1.rds"))
+ls_participants(867277, translate_attrs = FALSE) %>%
+  rename(red_izo = attribute_1, izo = attribute_2, p_izo = attribute_3, note = attribute_4) %>%
+  select(-c(participant_id, blacklisted, mpid)) %>%
+  write_rds(here("data-input/ucitele_MS_ZS_wave1_participants.rds"))
 
-# get whole response dataframe
-# first, get rsyntax.R file, then rdata.csv file, then run syntax on rdata
-# has to be neamed "data"
-data <- lsGetResponses(867277, languageCode = "cs", documentType = "rdata", sessionKey = sess_key)
+# reditele
+ls_responses(258724) %>% write_rds(here("data-input/reditele_ZS_SS_wave1.rds"))
+ls_participants(258724, translate_attrs = FALSE) %>%
+  select(-c(participant_id, blacklisted, mpid)) %>%
+  write_rds(here("data-input/reditele_ZS_SS_wave1_participants.rds"))
 
-lsGetResponses(867277,
-  languageCode = "cs",
-  documentType = "rsyntax",
-  rfile = here("data-input/rsyntax_ucitele.R"),
-  sessionKey = sess_key
-)
+# MS
+ls_responses(395636) %>% write_rds(here("data-input/ms_ucitele_reditele_wave1.rds"))
+ls_participants(395636, translate_attrs = FALSE) %>%
+  rename(red_izo = attribute_1, izo = attribute_2, p_izo = attribute_3) %>%
+  write_rds(here("data-input/ms_participants_wave1.rds"))
 
-source(textConnection(readLines(here("data-input/rsyntax_ucitele.R"), encoding = "UTF-8")[-1])) # skip 1st line, data are already loaded
-
-data %>% write_rds(here("data-input/EZ_ucitele_ZS_SS_wave1.rds"))

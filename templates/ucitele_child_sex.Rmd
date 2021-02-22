@@ -1,0 +1,15 @@
+```{r {{chunk}}, fig.cap = get_labs({{item}}), fig.asp = {{fig_asp}}}
+d %>%
+  ggplot(aes(
+    x = {{ item }},
+    y = red_izo %>% fct_reorder({{ item }} == "Žena", mean, .desc = TRUE),
+    fill = {{ item }} %>% fct_rev()
+  )) +
+  geom_bar(aes(x = ..count.., alpha = selection), col = "white", size = 1.1, position = "fill") +
+  scale_alpha(range = c(alpha_lower, 1), guide = "none") +
+  scale_fill_manual(values = scales::hue_pal(direction = -1)(2), drop = FALSE) +
+  scale_x_percent_cz() +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = NULL))) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank())
+```
+

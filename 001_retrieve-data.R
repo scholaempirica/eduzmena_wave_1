@@ -1,7 +1,10 @@
-library(reschola)
 library(tidyverse)
+library(magrittr) # convenient aliases and %<>% operator
 library(here)
 source("shared.R")
+
+# download all data from GDrive folder set in `shared.R` into `data-input`
+reschola::gd_download_folder(gd_url, overwrite = F, files_from_subfolders = T)
 
 # If there is other data you expect to only retrieve once
 # (from the web, public databases or APIs, etc.),
@@ -35,4 +38,3 @@ ls_responses(395636) %>% write_rds(here("data-input/ms_ucitele_reditele_wave1.rd
 ls_participants(395636, translate_attrs = FALSE) %>%
   rename(red_izo = attribute_1, izo = attribute_2, p_izo = attribute_3) %>%
   write_rds(here("data-input/ms_participants_wave1.rds"))
-

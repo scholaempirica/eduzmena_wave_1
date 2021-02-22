@@ -1,0 +1,15 @@
+```{r {{chunk}}, fig.cap = get_labs({{item}}), fig.asp = {{fig_asp}}}
+d %>%
+  filter(!is.na({{ item }})) %>%
+  ggplot(aes(
+    y = red_izo %>% fct_reorder({{ item }} == "Ano", mean, .desc = TRUE),
+    fill = {{ item }} %>% fct_rev() %>% fct_relevel("Ne", "Ano", after = 1)
+  )) +
+  geom_bar(aes(alpha = selection), position = "fill", col = "white", size = 1.1) +
+  scale_alpha(range = c(alpha_lower, 1), guide = "none") +
+  scale_x_percent_cz(limits = c(0, 1)) +
+  scale_fill_manual(values = c("darkgray", "#CA0020", "#0571B0"), drop = FALSE) +
+  guides(fill = guide_legend(reverse = T, override.aes = list(size = NULL))) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank())
+```
+

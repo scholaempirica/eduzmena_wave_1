@@ -15,39 +15,26 @@ url_id <- googledrive::as_id("https://drive.google.com/file/d/1Jx_ODcogsOfgetFvV
 drib <- googledrive::as_dribble(url_id)
 googledrive::drive_download(drib, paste0("data-input/", drib$name))
 
+# fetch from LimeSurvey ------------------------------------------------------
 
-# LimeSurvey API fetch ------------------------------------------------------
+# list of all questionnares
+ls_surveys()  #filter(str_detect(surveyls_title, "(?i)eduzměna"))
 
-# fixed and edited fork at my GitHub (main issue is the correct encoding)
-if (!require("LimeRick")) remotes::install_github("netique/LimeRick")
+# ucitele
+ls_responses(867277) %>% write_rds(here("data-input/ucitele_ZS_SS_wave1.rds"))
+ls_participants(867277, translate_attrs = FALSE) %>%
+  rename(red_izo = attribute_1, izo = attribute_2, p_izo = attribute_3, note = attribute_4) %>%
+  select(-c(participant_id, blacklisted, mpid)) %>%
+  write_rds(here("data-input/ucitele_MS_ZS_wave1_participants.rds"))
 
-# API calls reference list
-# https://api.limesurvey.org/classes/remotecontrol_handle.html
-
-options(lsAPIurl = limesurvey_api) # our API URL from shared.R
-options(lsUser = ls_cred("user")) # your LS username
-options(lsPass = ls_cred("pass")) # password to your LS account
-sess_key <- lsSessionKey("get") # obtain sesion key
+# reditele
+ls_responses(258724) %>% write_rds(here("data-input/reditele_ZS_SS_wave1.rds"))
+ls_participants(258724, translate_attrs = FALSE) %>%
+  select(-c(participant_id, blacklisted, mpid)) %>%
+  write_rds(here("data-input/reditele_ZS_SS_wave1_participants.rds"))
 
 # MS
-data <- lsGetResponses(395636, languageCode = "cs", documentType = "rdata")
-tmp <- tempfile(fileext = ".R")
-lsGetResponses(395636, languageCode = "cs", documentType = "rsyntax", rfile = tmp)
-source(textConnection(readLines(tmp, encoding = "UTF-8")[-1])) # skip 1st line, data are already loaded
-
-data %>% write_rds(here("data-input/msl_wave_1.rds"))
-
-# LimeSurvey API documentation is as bad as LimeSurvey itself,
-# after some try-errors and head scratching, found this should
-# return complete list of participants
-LimeRick::lsAPI("list_participants", params = list( # params order MUST be like that:
-  sSessionKey = sess_key,
-  iSurveyID = 395636,
-  iStart = 0, # API is javascript/node/react, so indexing begins with 0
-  iLimit = 9999, # sky is the limit
-  bUnused = FALSE,
-  aAttributes = c("attribute_1", "attribute_2", "attribute_3")
-)) %>%
-  unpack("participant_info") %>%
+ls_responses(395636) %>% write_rds(here("data-input/ms_ucitele_reditele_wave1.rds"))
+ls_participants(395636, translate_attrs = FALSE) %>%
   rename(red_izo = attribute_1, izo = attribute_2, p_izo = attribute_3) %>%
-  write_rds(here("data-input/ms_wave_1_participants.rds"))
+  write_rds(here("data-input/ms_participants_wave1.rds"))

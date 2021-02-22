@@ -1,0 +1,15 @@
+```{r {{chunk}}, fig.cap = get_labs({{item}}), fig.asp = {{fig_asp}}}
+d %>%
+  ggplot(aes(
+    y = red_izo %>%
+      fct_reorder({{ item }} %>% str_detect("(než 90)|(-90)"), mean, .desc = TRUE),
+    fill = {{ item }} %>% fct_rev() %>% fct_relabel(~ str_extract(.x, "(?<=\\().*%"))
+  )) + # percentage inside brackets
+  geom_bar(aes(alpha = selection), position = "fill", col = "white", size = 1.1) +
+  scale_alpha(range = c(alpha_lower, 1), guide = "none") +
+  scale_x_percent_cz(limits = c(0, 1)) +
+  scale_fill_schola(palette = "Blues", direction = 1, na_pos = "none") +
+  guides(fill = guide_legend(title = "podíl plného úvazku", reverse = T, override.aes = list(size = NULL))) +
+  theme_schola("x", legend.position = "bottom")
+```
+

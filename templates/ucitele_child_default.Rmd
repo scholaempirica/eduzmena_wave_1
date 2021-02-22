@@ -1,0 +1,6 @@
+```{r {{chunk}}, fig.cap = get_labs({{item}}), fig.asp = {{fig_asp}}}
+d %>%
+  ggplot(aes()) +
+  geom_label(aes(x = 0, y = 0, label = 'Item "{{item}}"\nbelongs to undefined template.\n\nSuitable response type should be\n"{{resp_type}}"'))
+```
+

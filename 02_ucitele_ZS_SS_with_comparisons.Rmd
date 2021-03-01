@@ -1,7 +1,7 @@
 ---
 title: "Výsledky z dotazníku pro učitele"
 team: výzkumný tým SCHOLA EMPIRICA
-author:
+authors:
   - "Magdaléna Klimešová^[Korespondenční autor. Kontakt: klimesova@scholaempirica.org]"
   - Jaromír Mazák
   - Jan Netík
@@ -22,10 +22,11 @@ output:
     num_format: cs
 lang: cs # cs or en
 toc-title: "Obsah zprávy"
-logo: logos/schola # chars which are escaped by pandoc are prohibited
+logo: logos/schola # for path with _ use "`logos/schola_logo.pdf`{=latex}"
 logo_height: 15pt
 logo_client: logos/eduzmena
 logo_client_height: 25pt
+head_height: false # may be used if fancyhdr complains 
 ---
 
 ```{r setup}

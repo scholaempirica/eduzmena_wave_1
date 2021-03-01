@@ -1,12 +1,9 @@
-This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020/W32TeX) (preloaded format=xelatex 2021.2.24)  1 MAR 2021 11:31
+This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020/W32TeX) (preloaded format=xelatex 2021.2.24)  1 MAR 2021 19:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**C:/Users/netik/Documents/GitHub/eduzmena_wave_1/reports-output/ucitele/pdf/02
-_ucitele_ZS_SS_691010901.tex
-
-(c:/Users/netik/Documents/GitHub/eduzmena_wave_1/reports-output/ucitele/pdf/02_
-ucitele_ZS_SS_691010901.tex
+**02_ucitele_ZS_SS_with_comparisons.tex
+(./02_ucitele_ZS_SS_with_comparisons.tex
 LaTeX2e <2020-10-01> patch level 4
 L3 programming layer <2021-02-18> (c:/Users/netik/AppData/Roaming/TinyTeX/texmf
 -dist/tex/latex/base/report.cls
@@ -777,8 +774,8 @@ Package morefloats Info: Maximum number of possible floats asked for: 36
 (c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/setspace/setspace.
 sty
 Package: setspace 2011/12/19 v6.7a set line spacing
-) (./02_ucitele_ZS_SS_691010901.aux)
-\openout1 = `02_ucitele_ZS_SS_691010901.aux'.
+) (./02_ucitele_ZS_SS_with_comparisons.aux)
+\openout1 = `02_ucitele_ZS_SS_with_comparisons.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 112.
 LaTeX Font Info:    ... okay on input line 112.
@@ -945,9 +942,10 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 112.
 LaTeX Info: Redefining \pageref on input line 112.
 LaTeX Info: Redefining \nameref on input line 112.
-(./02_ucitele_ZS_SS_691010901.out) (./02_ucitele_ZS_SS_691010901.out)
+(./02_ucitele_ZS_SS_with_comparisons.out) (./02_ucitele_ZS_SS_with_comparisons.
+out)
 \@outlinefile=\write3
-\openout3 = `02_ucitele_ZS_SS_691010901.out'.
+\openout3 = `02_ucitele_ZS_SS_with_comparisons.out'.
 
 LaTeX Info: Redefining \microtypecontext on input line 112.
 Package microtype Info: Character protrusion enabled (level 2).
@@ -1015,14 +1013,14 @@ LaTeX Font Info:    Font shape `TU/Roboto(0)/b/n' will be
 [1]
 LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
 (Font)              scaled to size 20.297pt on input line 165.
-(./02_ucitele_ZS_SS_691010901.toc
+(./02_ucitele_ZS_SS_with_comparisons.toc
 LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
 (Font)              scaled to size 6.52637pt on input line 6.
 LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
 (Font)              scaled to size 4.89478pt on input line 6.
 )
 \tf@toc=\write4
-\openout4 = `02_ucitele_ZS_SS_691010901.toc'.
+\openout4 = `02_ucitele_ZS_SS_with_comparisons.toc'.
 
 [2
 
@@ -1257,18 +1255,18 @@ Package fancyhdr Warning: \headheight is too small (25.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
 
-[18] (./02_ucitele_ZS_SS_691010901.aux)
-Package rerunfilecheck Info: File `02_ucitele_ZS_SS_691010901.out' has not chan
-ged.
+[18] (./02_ucitele_ZS_SS_with_comparisons.aux)
+Package rerunfilecheck Info: File `02_ucitele_ZS_SS_with_comparisons.out' has n
+ot changed.
 (rerunfilecheck)             Checksum: 6D79D58147188F77064B078F6CBF2C7E;871.
  ) 
 Here is how much of TeX's memory you used:
- 16522 strings out of 478937
- 311091 string characters out of 5865498
- 709721 words of memory out of 5000000
+ 16520 strings out of 478937
+ 310919 string characters out of 5865498
+ 709763 words of memory out of 5000000
  36045 multiletter control sequences out of 15000+600000
  412001 words of font info for 88 fonts, out of 8000000 for 9000
  19 hyphenation exceptions out of 8191
- 81i,15n,123p,1306b,415s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 81i,15n,123p,1238b,415s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on 02_ucitele_ZS_SS_691010901.pdf (19 pages).
+Output written on 02_ucitele_ZS_SS_with_comparisons.pdf (19 pages).

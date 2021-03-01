@@ -12,12 +12,6 @@ df <- read_rds(here("data-processed/ucitele_ZS_SS_wave1.rds"))
 
 # df %>% naniar::vis_miss()
 
-# based on assert block below, edit imposible values, store original in xxx_orig
-df$s3q5_orig <- df$s3q5
-df[wrong_selfedu_idx, "s3q5"] <- 350
-
-df$s0q2_orig <- df$s0q2
-df[wrong_age_idx, "s0q2"] <- NA
 
 # assert possible values
 wrong_age_idx <- df %>%
@@ -34,5 +28,13 @@ df %>% assert(within_bounds(0, 100), s8q2_a, s8q2_b, success_fun = success_logic
 
 # mahalanobis - for info
 df %>% insist_rows(maha_dist, within_n_sds(3), where(is.numeric), error_fun = error_df_return)
+
+
+# based on assert block above, edit imposible values, store original in xxx_orig
+df$s3q5_orig <- df$s3q5
+df[wrong_selfedu_idx, "s3q5"] <- 350
+
+df$s0q2_orig <- df$s0q2
+df[wrong_age_idx, "s0q2"] <- NA
 
 df %>% write_rds(here("data-processed/ucitele_ZS_SS_wave1.rds"))

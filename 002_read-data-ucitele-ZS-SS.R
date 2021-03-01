@@ -5,10 +5,16 @@ library(lubridate)
 library(here)
 
 # ucitele ZS SS wave1 -----------------------------------------------------
+# osloveni reditely
+invitation <- read_rds(here("data-input/ucitele_ZS_SS_wave1_osloveni.rds")) %>%
+  transmute(token, red_izo_from_invitation = redizo, group = `int/kontrol`, number_invited = pocet)
 
-# from LS API, foramtted with R syntax file from LS (see 001_retrieve-data.R)
-teachers <- read_rds(here("data-input/ucitele_ZS_SS_wave1.rds"))
+# add redizo from invitation and number invited to the participants table
 teachers_participants <- read_rds("data-input/ucitele_ZS_SS_wave1_participants.rds")
+teachers_participants <- left_join(teachers_participants, invitation, by = "token")
+
+# from LS API, formatted with R syntax file from LS (see 001_retrieve-data.R)
+teachers <- read_rds(here("data-input/ucitele_ZS_SS_wave1.rds"))
 
 # separate item labels (some operations strip them out)
 item_labels <- attributes(teachers)$variable.labels
@@ -34,6 +40,7 @@ df %<>% select(
     startlanguage,
     tid,
     id,
+    sent,
     blacklisted,
     startlanguage,
     usesleft
@@ -57,6 +64,7 @@ df %<>%
     submitted,
     closed,
     lastpage,
+    number_invited,
     starts_with("s"),
     -startdate,
     -submitdate,
@@ -109,6 +117,8 @@ item_labels[intersect(names(df), names(item_labels))] %>%
 # mark empty strings as NAs
 df %<>% mutate_if(is.character, ~na_if(., ""))
 
+attr(df, "variable.labels") <- NULL
+
 # write RDS (empty rows are removed)
 df %>%# remove_empty_at(-c(red_izo, email, token)) %>%
   write_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds"))
@@ -118,8 +128,12 @@ df %>%# remove_empty_at(-c(red_izo, email, token)) %>%
 
 df <- read_rds(here("data-input/reditele_ZS_SS_wave1.rds"))
 
+# bind with invitation survey to pickup REDIZOs
+df <- left_join(df, invitation, by = "token")
+
 # separate item labels (some operations strip them out)
-item_labels <- attributes(df)$variable.labels
+item_labels <- character(ncol(df))
+item_labels[seq_along(attributes(df)$variable.labels)] <- attributes(df)$variable.labels
 names(item_labels) <- colnames(df)
 item_labels %<>% as_tibble_row %>% clean_names() # harmonize colnames with below
 
@@ -145,12 +159,13 @@ df %<>% select(
 
 df %<>%
   mutate(
+    red_izo = red_izo_from_invitation,
     opened = ymd_hms(startdate),
     submitted = ymd_hms(submitdate),
     closed = ymd_hms(datestamp)
   ) %>%
   select(
-    # red_izo, # ehm no redizo whasoever...
+    red_izo,
     token,
     opened,
     submitted,
@@ -159,7 +174,8 @@ df %<>%
     starts_with("s"),
     -startdate,
     -submitdate,
-    -datestamp
+    -datestamp,
+    -sent
   ) %>%
   rename(
     last_page = lastpage
@@ -206,6 +222,10 @@ item_labels[intersect(names(df), names(item_labels))] %>%
 
 # mark empty strings as NAs
 df %<>% mutate_if(is.character, ~na_if(., ""))
+
+# remove labels that might be disruptive
+
+attr(df, "variable.labels") <- NULL
 
 # write RDS (empty rows are removed)
 df %>%# remove_empty_at(-c(red_izo, email, token)) %>%

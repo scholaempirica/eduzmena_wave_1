@@ -19,11 +19,14 @@ googledrive::drive_download(drib, paste0("data-input/", drib$name))
 # fetch from LimeSurvey ------------------------------------------------------
 
 # list of all questionnares
-ls_surveys()  #filter(str_detect(surveyls_title, "(?i)eduzměna"))
+ls_surveys()  #filter(str_detect(title, "(?i)eduzměna"))
 
 # ucitele
 ls_responses(867277) %>% write_rds(here("data-input/ucitele_ZS_SS_wave1.rds"))
 ls_participants(867277) %>% write_rds(here("data-input/ucitele_ZS_SS_wave1_participants.rds"))
+
+# osloveni ucitelu
+ls_export(156875) %>% write_rds(here("data-input/ucitele_ZS_SS_wave1_osloveni.rds"))
 
 # reditele
 ls_export(258724) %>% write_rds(here("data-input/reditele_ZS_SS_wave1.rds"))

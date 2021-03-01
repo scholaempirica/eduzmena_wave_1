@@ -17,9 +17,10 @@ params:
   alpha_lower: .6
 output: 
   reschola::schola_pdf:
-    keep_tex: false # debugging
+    keep_tex: false # for debugging
     template: templates/schola_template.tex
-lang: cs # sets language of the document, at the moment, it is only used by the lua filter above
+    num_format: cs
+lang: cs # cs or en
 toc-title: "Obsah zprávy"
 logo: logos/schola # chars which are escaped by pandoc are prohibited
 logo_height: 15pt
@@ -32,17 +33,6 @@ library(knitr)
 opts_knit$set(eval.after = "fig.cap") # evaluate fig.caps after the relevant object exist
 knitr::opts_chunk$set(fig.asp = params$fig_asp_body, echo = FALSE)
 options(scipen = 10) # force R to show full numbers, not scientific notation
-
-# Czech dec. mark and thousand sep.
-knitr::knit_hooks$set(
-  inline = function(x) {
-    if (!is.character(x)) {
-      prettyNum(x, big.mark = " ", decimal.mark = ",")
-    } else {
-      x
-    }
-  }
-)
 
 library(tidyverse)
 library(scales)

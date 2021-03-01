@@ -1,24 +1,30 @@
 ---
 title: "Výsledky z dotazníku pro učitele"
+team: výzkumný tým SCHOLA EMPIRICA
 author:
-- výzkumný tým SCHOLA EMPIRICA
-- "Magdaléna Klimešová^[Korespondenční autor. Kontakt: klimesova@scholaempirica.org], Jaromír Mazák, Jan Netík, Aleš Vomáčka, Martina Koutná"
-- a Marek Havrda
-date: '`r gsub("^0", "", format(Sys.time(), "%d. %B %Y"))`' # remove leading zero
+  - "Magdaléna Klimešová^[Korespondenční autor. Kontakt: klimesova@scholaempirica.org]"
+  - Jaromír Mazák
+  - Jan Netík
+  - Aleš Vomáčka
+  - Martina Koutná
+  - Marek Havrda
+date: '`r reschola::as_czech_date(Sys.time())`' # remove leading zero
 params:
-  redizo: "600099296" # there must be a value, to smoothly compile oustide Build script
+  redizo: "600044467" # there must be a value, to smoothly compile oustide Build script
   pilot: true
   fig_asp_body: .6
   fig_asp_appdx: .4
   alpha_lower: .6
 output: 
-  reschola::schola_word:
-    reference_docx: templates/template.docx
-    fig_caption: yes
-    toc: yes
-    number_sections: false
+  reschola::schola_pdf:
+    keep_tex: false # debugging
+    template: templates/schola_template.tex
 lang: cs # sets language of the document, at the moment, it is only used by the lua filter above
 toc-title: "Obsah zprávy"
+logo: logos/schola # chars which are escaped by pandoc are prohibited
+logo_height: 15pt
+logo_client: logos/eduzmena
+logo_client_height: 25pt
 ---
 
 ```{r setup}
@@ -47,59 +53,14 @@ library(lubridate)
 set_reschola_ggplot_fonts()
 theme_set(theme_schola())
 source("shared.R", local = TRUE) # use the environment of the source (because of Makefile)
-
-# those two functions cannot be sources as a part of shared.R for UNKNOWN REASON!!
-# bitewise, everything is correct, but knitting within the rmarkdown session messes up the encoding somehow...
-month_czech <- function(month, case = c("nominative", "locative", "genitive")) {
-  declensed <- switch(match.arg(case),
-    "nominative" = c(
-      "leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec"
-    ),
-    "locative" = c(
-      "lednu", "únoru", "březnu", "dubnu", "květnu", "červnu", "červenci", "srpnu", "září", "říjnu", "listopadu", "prosinci"
-    ),
-    "genitive" = c(
-      "ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"
-    )
-  )
-
-  month <- month(month)
-  declensed[month]
-}
-
-
-interval_print <- function(x, y) {
-  days <- unique(day(c(x, y)))
-  months <- unique(month(c(x, y)))
-  years <- unique(year(c(x, y)))
-
-  if (length(days) != 1 & length(months) == 1 & length(years) == 1) {
-    paste0(days[1], ".–", days[2], ". ", month_czech(months[1], "gen"), " ", years[1])
-  } else if (length(days) != 1 & length(months) != 1 & length(years) == 1) {
-    paste0(days[1], ". ", month_czech(months[1], "gen"), " – ", days[2], ". ", month_czech(months[2], "gen"), " ", years[1])
-  } else if (length(days) != 1 & length(months) != 1 & length(years) != 1) {
-    paste0(days[1], ". ", month_czech(months[1], "gen"), " ", years[1], " – ", days[2], ". ", month_czech(months[2], "gen"), " ", years[2])
-  } else if (length(days) == 1 & length(months) != 1 & length(years) == 1) {
-    paste0(days[1], ". ", month_czech(months[1], "gen"), " – ", days[1], ". ", month_czech(months[2], "gen"), " ", years[1])
-  } else {
-    stop("Maturing lifecycle, case not yet defined...")
-  }
-}
-
 ```
 
 ```{r data}
 # from YAML, general lower alpha bound, how transparent the OTHERS would be
 alpha_lower <- params$alpha_lower
 
-# if pilot
-if (params$pilot) {
-  d <- read_rds(here("data-processed", "ucitele_semilsko.rds")) # real semilsko pilot data
-  d %<>% filter(red_izo == params$redizo) # only one in pilot
-  alpha_lower <- 1 # if only one group, make it solid
-} else {
-  d <- read_rds(here("data-processed", "ucitele_simulated.rds"))
-}
+  d <- read_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds"))
+  d %<>% filter(red_izo == params$redizo) # only one school per report
 
 # append arbitrary teacher id
 d %<>%
@@ -120,12 +81,12 @@ d %<>% mutate(
 )
 
 # get human readable REDIZO & school name from the big database for further use
-instit_digest <- read_rds(here("data-input/institutions_digest.rds"))
+instit_digest <- read_rds(here("data-input/institutions_ms_zs_ss.rds"))
 
 selected_school_name <- instit_digest %>%
   filter(red_izo == params$redizo) %>%
-  distinct(across(c(red_izo, nazev, nazev_simple))) %>%
-  pull(nazev)
+  distinct(across(c(red_izo, fullname, name))) %>% 
+  pull(fullname) # some shortened name are useles (e.g. "základní škola"...)
 
 ```
 
@@ -133,7 +94,9 @@ selected_school_name <- instit_digest %>%
 
 ```{r filterNA}
 total_teachers <- nrow(d)
-total_invited <- d$number_invited %>% unique()
+
+# total_invited <- d$number_invited %>% unique()
+total_invited <- NA
 
 opened_count <- d %>%
   filter(!is.na(opened)) %>%
@@ -145,7 +108,7 @@ opened_not_sumbitted <- d %>%
 
 completed <- opened_count - opened_not_sumbitted
 
-response_rate <- percent(completed/total_invited, 1, suffix = " %", decimal.mark = ",")
+response_rate <- percent(completed/total_teachers, 1, suffix = "\u00A0%", decimal.mark = ",") # or /total_invited if available
 
 last_pages_not_submitted <- d %>%
   filter(!is.na(opened) & is.na(submitted)) %>%
@@ -185,7 +148,7 @@ n_escapes_outliers <- d[escape_ind, ]$n_escape
 opened_minmax <- d %>% summarize(min = min(opened, na.rm = TRUE),
                 max = max(opened, na.rm = TRUE))
 
-opened_minmax_int <- interval_print(opened_minmax$min, opened_minmax$max)
+opened_minmax_int <- czech_date_interval(opened_minmax$min, opened_minmax$max)
 
 ```
 
@@ -193,17 +156,18 @@ opened_minmax_int <- interval_print(opened_minmax$min, opened_minmax$max)
 
 ---
 subtitle: |
-  `r selected_school_name` (RED IZO: `r params$redizo`)
+  | `r selected_school_name`
+  | RED IZO: `r params$redizo`
 abstract: |
-  Zpráva seznamuje čtenáře s výsledky pilotního šetření mezi učiteli v rámci projektu Eduzměna, u kterých jsme mapovali situaci v celé řadě oblastí. Šlo zejména o vnímání školního prostředí, sebehodnocení pedagogických dovedností a víru v dopady své práce, otázky seberozvoje, mentoringu a účinku zpětné vazby, vnímané autonomie a podpory ze strany vedení školy, komunikaci a spolupráci s různými aktéry, spokojenost s prací a potenciální pracovní stresory, vnímání odměny, prestiže pedagogické profese a školy jako celku. Zmíněné oblasti jsme mapovali pomocí online dotazníku, jehož sběr probíhal v rozmezí `r opened_minmax_int`.
+  Zpráva seznamuje čtenáře s výsledky šetření mezi učiteli v rámci projektu Eduzměna, u kterých jsme mapovali situaci v celé řadě oblastí. Šlo zejména o vnímání školního prostředí, sebehodnocení pedagogických dovedností a víru v dopady své práce, otázky seberozvoje, mentoringu a účinku zpětné vazby, vnímané autonomie a podpory ze strany vedení školy, komunikaci a spolupráci s různými aktéry, spokojenost s prací a potenciální pracovní stresory, vnímání odměny, prestiže pedagogické profese a školy jako celku. Zmíněné oblasti jsme mapovali pomocí online dotazníku, jehož sběr probíhal v rozmezí `r opened_minmax_int`.
   
-  Pilotního šetření se zúčastnily pouze dvě školy. Kvůli naší přísné politice ochrany osobních údajů prezentujeme *výsledky pouze té vaší* (uvedené v podditulku dokumentu), neboť identitu druhé školy lze s určitou pravděpodobností odvodit. Při budoucím, "ostrém" dotazování budeme ve zprávách jednotlivé oblasti anonymně porovnávat s dalšími zúčastněnými školami, abyste dostali informaci, jak si ve srovnání s ostatními stojíte.
+  <!-- Pilotního šetření se zúčastnily pouze dvě školy. Kvůli naší přísné politice ochrany osobních údajů prezentujeme *výsledky pouze té vaší* (uvedené v podditulku dokumentu), neboť identitu druhé školy lze s určitou pravděpodobností odvodit. Při budoucím, "ostrém" dotazování budeme ve zprávách jednotlivé oblasti anonymně porovnávat s dalšími zúčastněnými školami, abyste dostali informaci, jak si ve srovnání s ostatními stojíte. -->
 ---
 
 
 ```{r labs}
 # this chunk should be used for cetral item wording edits (shortening etc.)
-item_labs_list <- read_rds(here("data-processed/ucitele_semilsko_labels.rds"))
+item_labs_list <- read_rds(here("data-processed/ucitele_ZS_SS_wave1_labels.rds"))
 
 # the most important is the part in brackets, so extract it
 item_labs_list %<>% map(~ .x %>%
@@ -216,15 +180,15 @@ item_labs_list %<>% map(~ .x %>%
 # when you change the CSV created there, just rerun this chunk to take effect
 
 # export labels as csv for easier editing (auto created if does not exist)
-if (!file.exists(here("data-processed", "item_labs_edit.csv"))) {
+if (!file.exists(here("data-processed", "ucitele_ZS_SS_wave1_labels.csv"))) {
   item_labs_list %>%
     unlist() %>%
     enframe(name = "code", value = "wording") %>%
-    write_excel_csv2(here("data-processed", "item_labs_edit.csv"))
+    write_excel_csv2(here("data-processed", "ucitele_ZS_SS_wave1_labels.csv"))
 }
 
 # import edited labels
-item_labs_edited <- read_delim(here("data-processed/item_labs_edit.csv"),
+item_labs_edited <- read_delim(here("data-processed/ucitele_ZS_SS_wave1_labels.csv"),
   delim = ";", col_types = cols(.default = col_character())
 )
 
@@ -317,16 +281,16 @@ items %<>% mutate(fig_asp_appdx = if_else(resp_type == "time", fig_asp_appdx + .
 
 # Jak se zprávou pracovat
 
-Jednotlivé položky dotazníku, z nichž velká část vychází z ověřených mezinárodních šetření typu TALIS či PISA, jsou sdružovány do tzv. škál (dimenzí) postihujících určité koncepty nebo oblasti. Položky se ptají na postoje respondentů, na to, jak danou otázku vnímají. Škály, které uvidíte na následujících stranách, ukazují vždy průměr z příslušných položek^[Jednotlivým kategoriím odpovědí se přiřazují přirozená, po sobě jsoucí čísla. Např. "rozhodně nesouhlasím -- rozhodně souhlasím" se očíslují 1--4, a číslo tak vyjadřuje míru souhlasu.] (konkrétní znění je k vidění v příloze). Škály prezentujeme tak, že žádoucí je vždy vyšší bodový zisk (a to i u škály "Pracovní vytížení a stres", jejíž původní bodování je pro jednotnost v tomto dotazníku "otočeno"). Podle mediánu^[Pokud bychom seřadili výsledky jednotlivých učitelů podle počtu bodů v dotazníku či vybraném souboru otázek, pak medián označuje hodnotu *právě uprostřed* takové řady. Pokud je učitelů sudý počet, jde o průměr prostřední dvojice učitelů.] získaných bodů také jednotlivé škály řadíme. Vizualizace všech položek dotazníku, které tvoří jednotlivé škály, jsou prezentovány v příloze.
+Jednotlivé položky dotazníku, z nichž velká část vychází z ověřených mezinárodních šetření typu TALIS či PISA, jsou sdružovány do tzv. škál (dimenzí) postihujících určité koncepty nebo oblasti. Položky se ptají na postoje respondentů, na to, jak danou otázku vnímají. Škály, které uvidíte na následujících stranách, ukazují vždy průměr z příslušných položek^[Jednotlivým kategoriím odpovědí se přiřazují přirozená, po sobě jsoucí čísla. Např. "rozhodně nesouhlasím -- rozhodně souhlasím" se očíslují 1--4, a číslo tak vyjadřuje míru souhlasu.] (konkrétní znění je k vidění v příloze). Škály prezentujeme tak, že žádoucí je vždy vyšší bodový zisk (a to i u škály "Pracovní vytížení a stres", jejíž původní bodování je pro jednotnost v tomto dotazníku "otočeno"). Podle mediánu^[Pokud bychom seřadili výsledky jednotlivých učitelů podle počtu bodů v dané škále, pak medián označuje hodnotu *právě uprostřed* takové řady. Pokud je učitelů sudý počet, jde o průměr prostřední dvojice učitelů.] získaných bodů také jednotlivé škály řadíme. Vizualizace všech položek dotazníku, které tvoří jednotlivé škály, jsou prezentovány v příloze.
 
 Zpráva je sestavena s cílem poskytnout rychlý vhled. Tematické sekce, podle kterých byl dotazník členěn, jsou zde částečně potlačeny a snažíme se maximum informací prezentovat pokud možno v kompaktní grafické podobě. Ve zprávě využíváme dva typy grafů:
 
-- **krabicový graf** (angl. *boxplot*), který přehledně zobrazuje typické hodnoty -- silnější linka vyznačuje medián, šedá, vyplněná část ohraničuje 50 % prostředních hodnot kolem mediánu (tj. mezi 25. a 75. percentilem, na obrázku jako IQR), horizontální úsečky pak poukazují na 1,5násobek tohoto rozpětí. Hodnoty mimo představují mimořádně odlehlá pozorování či extrémy (tvoří dohromady méně než 1 % dat). Samotné hodnoty jsou na ose "x" (horizontální osa) a tato osa má vždy rozsah podle toho, kolik bodů je možné získat.
+- **krabicový graf** (viz Graf č. 1 níže), který přehledně zobrazuje typické hodnoty -- silnější linka vyznačuje medián, šedá, vyplněná část ohraničuje 50 % prostředních hodnot kolem mediánu (tj. mezi 25. a 75. percentilem, na obrázku jako IQR), horizontální úsečky pak poukazují na 1,5násobek tohoto rozpětí. Hodnoty mimo představují mimořádně odlehlá pozorování či extrémy (tvoří dohromady méně než 1 % dat). Samotné hodnoty jsou na ose "x" (horizontální osa) a tato osa má vždy rozsah podle toho, kolik bodů je možné získat.
 
-![Obr. 1. Popis krabicového grafu ($\sigma$ značí směrodatnou odchylku, spodní část obrázku znázorňuje rozložení hodnot)](figures/boxplot_description.png)
+![Popis krabicového grafu ($\sigma$ značí směrodatnou odchylku, spodní část obrázku znázorňuje rozložení hodnot)](figures/boxplot_description.pdf)
 
 
-- **skládaný sloupcový graf** (angl. *stacked barplot*) vizualizuje podíl jednotlivých odpovědí pro jednotlivé položky dotazníku. Osa "x" je tedy vyjádřená v procentech.
+- **skládaný sloupcový graf** (viz Graf č. \@ref(fig:likert)) vizualizuje podíl jednotlivých odpovědí pro jednotlivé položky dotazníku. Osa "x" je tedy vyjádřená v procentech.
 
 <!-- \newpage -->
 
@@ -398,8 +362,7 @@ scales_labs_list <- list(
 ```
 
 
-
-```{r scales1to4, fig.asp=.9, fig.cap='Všechny škály s rozsahem 1-4 body^[Hvězdička značí, že se jedná o dílčí škály odvozené z "Vnímané osobní účinnosti (self-efficacy)"]'}
+```{r scales1to4, fig.asp=.9, fig.cap='Všechny škály s rozsahem 1--4 body'}
 scale_scores %>%
   select(-c(
     tot_s2q1_T3COOP,
@@ -415,12 +378,13 @@ scale_scores %>%
   scale_y_discrete(labels = function(x) {
     get_labs(x, 40, labs_list = scales_labs_list)
   }) +
+  labs(x = "body", caption = "Pozn.: Hvězdička značí, že se jedná o dílčí škály odvozené z „Vnímané osobní účinnosti (self-efficacy)“") +
   theme_schola("x") +
-  theme(panel.grid.major.y = element_line())
+  theme(panel.grid.major.y = element_line(), axis.title.x = element_text())
 
 ```
 
-```{r scales1to6, fig.asp=.3, fig.cap='Spolupráce mezi učiteli (škály s rozsahem 1-6 bodů)^[Souhrnná škála "Spolupráce mezi učiteli" je průměrem zbylých dvou.]'}
+```{r scales1to6, fig.asp=.3, fig.cap='Spolupráce mezi učiteli (škály s rozsahem 1--6 bodů)'}
 scale_scores %>%
   select(c(
     tot_s2q1_T3COOP,
@@ -437,7 +401,8 @@ scale_scores %>%
   scale_y_discrete(labels = function(x) {
     get_labs(x, 40, labs_list = scales_labs_list)
   }) +
-  theme_schola("x") + theme(panel.grid.major.y =  element_line())
+  labs(x = "body", caption = "Pozn.: Souhrnná škála „Spolupráce mezi učiteli“ je průměrem zbylých dvou.") +
+  theme_schola("x") + theme(panel.grid.major.y =  element_line(), axis.title.x = element_text())
 ```
 
 \newpage
@@ -563,8 +528,6 @@ d %>%
 ```
 
 
-
-
 ```{r profDevelop, fig.cap=tidy_labs(s3q5), fig.asp=.19}
 d %>%
   ggplot(aes(s3q5,
@@ -576,7 +539,6 @@ d %>%
   theme_schola("x", axis.text.y = element_blank(), axis.title.x = element_text())
 
 ```
-
 
 
 ```{r profDevelOutliers}
@@ -624,7 +586,7 @@ cat(paste0('Původní odpověďi obsahovaly minimálně jednu nerealistickou hod
 \newpage
 
 ```{r feedbackText, results='asis', include = ifelse(any(d$s3q3 == "Ano"), TRUE, FALSE)}
-pos_feedback <- d$s3q3 %>% fct_count(prop = TRUE) %>% mutate(p = scales::percent(p, 1, suffix = " %", decimal.mark = ","))
+pos_feedback <- d$s3q3 %>% fct_count(prop = TRUE) %>% mutate(p = scales::percent(p, 1, suffix = "\u00A0%", decimal.mark = ","))
 
 feedback_yes <-  pos_feedback %>% filter(f == "Ano")
 feedback_no <-  pos_feedback %>% filter(f == "Ne")
@@ -683,7 +645,10 @@ d %>%
 
 Tato sekce shrnuje základní, zejména sociodemografické údaje o učitelích, kteří dotazník vyplnili. Dále zachycuje jejich pedagogické zkušenosti, délku učitelského úvazku a zprostředkovaně také motivaci k volbě povolání (viz graf č. \@ref(fig:career)). Graf č. \@ref(fig:subjects) odkazuje na skladbu vyučovaných předmětů, resp. jejich kategorií.
 
-Ředitelé odeslali pozvánku k vyplnění dotazníku celkem `r total_invited` učitelům a učitelkám. Z toho `r opened_count` dotazník otevřelo a `r completed` ho vyplněný odeslalo. Efektivní návratnost je tedy `r response_rate`.
+<!-- Ředitelé odeslali pozvánku k vyplnění dotazníku celkem `r total_invited` učitelům a učitelkám. -->
+<!-- Z toho `r opened_count` dotazník otevřelo a `r completed` ho vyplněný odeslalo. Efektivní návratnost je tedy `r response_rate`. -->
+
+Celkem `r opened_count` učitelů dotazník otevřelo a `r completed` ho vyplněný odeslalo. Efektivní návratnost je tedy `r response_rate`.
 
 Běžný počet přeskočených nepovinných položek je `r median(d$n_miss_vars)`, "únikových" voleb typu "Nevím / nechci odpovědět" pak učitelé běžně využívali `r escape_med`krát. `r length(n_escapes_outliers)` učitel/é tuto možnost volil/i mimořádně často -- nejvíce `r n_escapes_outliers[1]`krát.
 
@@ -791,7 +756,7 @@ d %>% select(s0q5_a, s0q5_b) %>%
 
 ```{r lowerProp}
 lower_count <- length(d$s8q2_a[d$s8q2_a == 0])
-prop_lower <- percent(lower_count / length(d$s8q2_a), suffix = " %", accuracy = 1, decimal.mark = ",")
+prop_lower <- percent(lower_count / length(d$s8q2_a), suffix = "\u00A0%", accuracy = 1, decimal.mark = ",")
 ```
 
 Celkem `r lower_count` (tj. cca `r prop_lower`) učitelů nebo učitelek vyučuje výhradně na 2. stupni. Následující graf tedy ukazuje procento výuky na 1. stupni reportované *zbývajícími učiteli*. Bod na úrovni 75&nbsp;% znamená, že daný učitel vyučuje 75&nbsp;% času na prvním stupni a 25&nbsp;% na stupni druhém.

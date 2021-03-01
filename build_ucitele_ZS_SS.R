@@ -24,9 +24,12 @@
 
 # those 2 lines propagates argument form Makefile to prevent report opening
 makefile_args <- commandArgs(trailingOnly = TRUE)
+cat("open: ", ifelse("dontOpen" %in% makefile_args, FALSE, TRUE))
 
 # -------------------------------------------------------------------------
 library(here)
+library(tidyverse)
+library(reschola)
 source("shared.R")
 
 # source('002_read-data-ucitele.R')
@@ -35,16 +38,14 @@ source("shared.R")
 # -------------------------------------------------------------------------
 
 # for which REDIZO shlould the report be compiled?
-red_izos <- c("600099296",
-              "600099237"
-              ) # pilot
+red_izos <- read_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds")) %>% pull(red_izo) %>% unique
 
 purrr::map(
   red_izos,
-  ~ compile_and_open("02_ucitele_redone.Rmd", clean = TRUE,
-    open_success = ifelse("dontOpen" %in% makefile_args, FALSE, TRUE), # when called from make, don't open anything regardless of anything
-    output_dir = here("reports-output", "ucitele"),
-    output_file = paste0("02_ucitele_redone_", .x, ".docx"),
+  ~ compile_and_open("02_ucitele_ZS_SS.Rmd", clean = TRUE,
+    open_on_success = ifelse("dontOpen" %in% makefile_args, FALSE, TRUE), # when called from make, don't open anything regardless of anything
+    output_dir = here("reports-output", "ucitele", "pdf"),
+    output_file = paste0("02_ucitele_ZS_SS_", .x, ".pdf"),
     params = list(
       redizo = .x
       # pilot = ifelse("pilot" %in% makefile_args, TRUE, FALSE),

@@ -1,0 +1,1274 @@
+This is XeTeX, Version 3.14159265-2.6-0.999992 (TeX Live 2020/W32TeX) (preloaded format=xelatex 2021.2.24)  1 MAR 2021 11:45
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**C:/Users/netik/Documents/GitHub/eduzmena_wave_1/reports-output/ucitele/pdf/02
+_ucitele_ZS_SS_600146651.tex
+
+(c:/Users/netik/Documents/GitHub/eduzmena_wave_1/reports-output/ucitele/pdf/02_
+ucitele_ZS_SS_600146651.tex
+LaTeX2e <2020-10-01> patch level 4
+L3 programming layer <2021-02-18> (c:/Users/netik/AppData/Roaming/TinyTeX/texmf
+-dist/tex/latex/base/report.cls
+Document Class: report 2020/04/10 v1.4m Standard LaTeX document class
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2020/04/10 v1.4m Standard LaTeX file (size option)
+)
+\c@part=\count175
+\c@chapter=\count176
+\c@section=\count177
+\c@subsection=\count178
+\c@subsubsection=\count179
+\c@paragraph=\count180
+\c@subparagraph=\count181
+\c@figure=\count182
+\c@table=\count183
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/amssymb.s
+ty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/amsfonts.
+sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks15
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsmath/amsmath.st
+y
+Package: amsmath 2020/09/23 v2.17i AMS math features
+\@mathmargin=\skip49
+For additional information on amsmath, use the `?' option.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsmath/amstext.st
+y
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks16
+\ex@=\dimen139
+))
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen140
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count184
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count185
+\leftroot@=\count186
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count187
+\DOTSCASE@=\count188
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box47
+\strutbox@=\box48
+\big@size=\dimen141
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count189
+\c@MaxMatrixCols=\count190
+\dotsspace@=\muskip16
+\c@parentequation=\count191
+\dspbrk@lvl=\count192
+\tag@help=\toks17
+\row@=\count193
+\column@=\count194
+\maxfields@=\count195
+\andhelp@=\toks18
+\eqnshift@=\dimen142
+\alignsep@=\dimen143
+\tagshift@=\dimen144
+\tagwidth@=\dimen145
+\totwidth@=\dimen146
+\lineht@=\dimen147
+\@envbody=\toks19
+\multlinegap=\skip50
+\multlinetaggap=\skip51
+\mathdisplay@stack=\toks20
+LaTeX Info: Redefining \[ on input line 2923.
+LaTeX Info: Redefining \] on input line 2924.
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/ifxetex.st
+y
+Package: ifxetex 2019/10/25 v0.7 ifxetex legacy package. Use iftex instead.
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2020/03/06 v1.0d TeX engine tests
+))
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/ifluatex.s
+ty
+Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
+) (c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/fixltx2e.st
+y
+Package: fixltx2e 2016/12/29 v2.1a fixes to LaTeX (obsolete)
+Applying: [2015/01/01] Old fixltx2e package on input line 46.
+
+Package fixltx2e Warning: fixltx2e is not required with releases after 2015
+(fixltx2e)                All fixes are now in the LaTeX kernel.
+(fixltx2e)                See the latexrelease package for details.
+
+Already applied: [0000/00/00] Old fixltx2e package on input line 53.
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/fontspec/fontspec.
+sty
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3packages/xparse/
+xparse.sty
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2021-02-18 L3 programming layer (loader) 
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backen
+d-xetex.def
+File: l3backend-xetex.def 2021-02-18 L3 backend support: XeTeX
+(|extractbb --version)
+\c__kernel_sys_dvipdfmx_version_int=\count196
+\l__color_backend_stack_int=\count197
+\g__color_backend_stack_int=\count198
+\g__graphics_track_int=\count199
+\l__pdf_internal_box=\box49
+\g__pdf_backend_object_int=\count266
+\g__pdf_backend_annotation_int=\count267
+\g__pdf_backend_link_int=\count268
+))
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3packages/xparse/
+xparse-2020-10-01.sty
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3packages/xparse/
+xparse-generic.tex)))
+Package: fontspec 2020/02/21 v2.7i Font selection for XeLaTeX and LuaLaTeX
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/fontspec/fontspec-
+xetex.sty
+Package: fontspec-xetex 2020/02/21 v2.7i Font selection for XeLaTeX and LuaLaTe
+X
+\l__fontspec_script_int=\count269
+\l__fontspec_language_int=\count270
+\l__fontspec_strnum_int=\count271
+\l__fontspec_tmp_int=\count272
+\l__fontspec_tmpa_int=\count273
+\l__fontspec_tmpb_int=\count274
+\l__fontspec_tmpc_int=\count275
+\l__fontspec_em_int=\count276
+\l__fontspec_emdef_int=\count277
+\l__fontspec_strong_int=\count278
+\l__fontspec_strongdef_int=\count279
+\l__fontspec_tmpa_dim=\dimen148
+\l__fontspec_tmpb_dim=\dimen149
+\l__fontspec_tmpc_dim=\dimen150
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2020/08/10 v2.0s Standard LaTeX package
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/fontspec/fontspec.
+cfg)))
+
+Package fontspec Info: Roboto scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto/B scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto/B scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto/I scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto/I scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto/BI scale = 0.8157905504116836.
+
+
+Package fontspec Info: Roboto/BI scale = 0.8157905504116836.
+
+
+Package fontspec Info: Font family 'Roboto(0)' created for font 'Roboto' with
+(fontspec)             options
+(fontspec)             [Ligatures=TeX,Scale=MatchLowercase,Ligatures=TeX].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/OT:script=latn;language
+=dflt;mapping=tex-text;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/OT:script=latn;language
+=dflt;+smcp;mapping=tex-text;"
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/B/OT:script=latn;langua
+ge=dflt;mapping=tex-text;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/B/OT:script=latn;langua
+ge=dflt;+smcp;mapping=tex-text;"
+(fontspec)             - 'italic' (m/it) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/I/OT:script=latn;langua
+ge=dflt;mapping=tex-text;"
+(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/I/OT:script=latn;langua
+ge=dflt;+smcp;mapping=tex-text;"
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/BI/OT:script=latn;langu
+age=dflt;mapping=tex-text;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
+(fontspec)             <->s*[0.8157905504116836]"Roboto/BI/OT:script=latn;langu
+age=dflt;+smcp;mapping=tex-text;"
+
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 9.78955pt on input line 25.
+
+Package fontspec Info: Roboto scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto/B scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto/B scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto/I scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto/I scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto/BI scale = 0.8157929572142704.
+
+
+Package fontspec Info: Roboto/BI scale = 0.8157929572142704.
+
+
+Package fontspec Info: Font family 'Roboto(1)' created for font 'Roboto' with
+(fontspec)             options
+(fontspec)             [Ligatures=TeX,Scale=MatchLowercase,WordSpace={1,0,0},Hy
+phenChar=None,PunctuationSpace=WordSpace].
+(fontspec)              
+(fontspec)              This font family consists of the following NFSS
+(fontspec)             series/shapes:
+(fontspec)              
+(fontspec)             - 'normal' (m/n) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/OT:script=latn;language
+=dflt;mapping=tex-text;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/OT:script=latn;language
+=dflt;+smcp;mapping=tex-text;"
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'bold' (b/n) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/B/OT:script=latn;langua
+ge=dflt;mapping=tex-text;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/B/OT:script=latn;langua
+ge=dflt;+smcp;mapping=tex-text;"
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'italic' (m/it) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/I/OT:script=latn;langua
+ge=dflt;mapping=tex-text;"
+(fontspec)             - 'italic small caps'  (m/scit) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/I/OT:script=latn;langua
+ge=dflt;+smcp;mapping=tex-text;"
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+(fontspec)             - 'bold italic' (b/it) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/BI/OT:script=latn;langu
+age=dflt;mapping=tex-text;"
+(fontspec)             - 'bold italic small caps'  (b/scit) with NFSS spec.:
+(fontspec)             <->s*[0.8157929572142704]"Roboto/BI/OT:script=latn;langu
+age=dflt;+smcp;mapping=tex-text;"
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 2\font =1\fontdimen 2\font \fontdimen 3\font
+(fontspec)             =0\fontdimen 3\font \fontdimen 4\font =0\fontdimen
+(fontspec)             4\font \fontdimen 7\font =0\fontdimen 2\font
+(fontspec)             \tex_hyphenchar:D \font =-1\scan_stop: 
+
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/geometry/geometry.
+sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/keyval.st
+y
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks21
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+\Gm@cnth=\count280
+\Gm@cntv=\count281
+\c@Gm@tempcnt=\count282
+\Gm@bindingoffset=\dimen151
+\Gm@wd@mp=\dimen152
+\Gm@odd@mp=\dimen153
+\Gm@even@mp=\dimen154
+\Gm@layoutwidth=\dimen155
+\Gm@layoutheight=\dimen156
+\Gm@layouthoffset=\dimen157
+\Gm@layoutvoffset=\dimen158
+\Gm@dimlist=\toks22
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/floatrow/floatrow.
+sty
+Package: floatrow 2008/08/02 v0.3b floatrow: float package extension
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/caption/caption3.s
+ty
+Package: caption3 2020/10/21 v2.2e caption3 kernel (AR)
+\captionmargin=\dimen159
+\captionmargin@=\dimen160
+\captionwidth=\dimen161
+\caption@tempdima=\dimen162
+\caption@indent=\dimen163
+\caption@parindent=\dimen164
+\caption@hangindent=\dimen165
+Package caption Info: Standard document class detected.
+)
+\c@float@type=\count283
+\float@exts=\toks23
+\float@box=\box50
+\@floatcapt=\box51
+Package floatrow Info: Modified float package code loaded on input line 455.
+Package floatrow Info: Modified rotfloat package code loaded on input line 473.
+
+\FR@everyfloat=\toks24
+\flrow@foot=\insert252
+\FB@wd=\dimen166
+\FBo@wd=\dimen167
+\FBc@wd=\dimen168
+\FBo@ht=\skip52
+\FBc@ht=\skip53
+\FBf@ht=\skip54
+\FBo@max=\skip55
+\FBc@max=\skip56
+\FBf@max=\skip57
+\c@FBl@b=\count284
+\floatbox@depth=\count285
+\c@FRobj=\count286
+\c@FRsobj=\count287
+\Xhsize=\skip58
+\sXhsize=\skip59
+\Zhsize=\skip60
+\sZhsize=\skip61
+\flrow@rowbox=\box52
+\FR@Zunitlength=\dimen169
+\c@FBcnt=\count288
+\FPOScnt=\count289
+\LTleft=\skip62
+\LTright=\skip63
+\LTleft=\skip64
+\LTright=\skip65
+\flrow@types=\toks25
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/fancyhdr/fancyhdr.
+sty
+Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and foote
+rs
+\f@nch@headwidth=\skip66
+\f@nch@O@elh=\skip67
+\f@nch@O@erh=\skip68
+\f@nch@O@olh=\skip69
+\f@nch@O@orh=\skip70
+\f@nch@O@elf=\skip71
+\f@nch@O@erf=\skip72
+\f@nch@O@olf=\skip73
+\f@nch@O@orf=\skip74
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/caption/caption.st
+y
+Package: caption 2020/10/26 v3.5g Customizing captions (AR)
+\c@caption@flags=\count290
+\c@continuedfloat=\count291
+Package caption Info: float package is loaded.
+Package caption Info: floatrow package is loaded.
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/graphicx.
+sty
+Package: graphicx 2020/09/09 v1.2b Enhanced LaTeX Graphics (DPC,SPQR)
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/graphics.
+sty
+Package: graphics 2020/08/30 v1.4c Standard LaTeX Graphics (DPC,SPQR)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics-cfg/graph
+ics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: xetex.def on input line 105.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics-def/xetex
+.def
+File: xetex.def 2020/08/26 v5.0i Graphics/color driver for xetex
+))
+\Gin@req@height=\dimen170
+\Gin@req@width=\dimen171
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/booktabs/booktabs.
+sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen172
+\lightrulewidth=\dimen173
+\cmidrulewidth=\dimen174
+\belowrulesep=\dimen175
+\belowbottomsep=\dimen176
+\aboverulesep=\dimen177
+\abovetopsep=\dimen178
+\cmidrulesep=\dimen179
+\cmidrulekern=\dimen180
+\defaultaddspace=\dimen181
+\@cmidla=\count292
+\@cmidlb=\count293
+\@aboverulesep=\dimen182
+\@belowrulesep=\dimen183
+\@thisruleclass=\count294
+\@lastruleclass=\count295
+\@thisrulewidth=\dimen184
+) (c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.
+sty
+Package: hyperref 2021-02-10 v7.00j Hypertext links for LaTeX
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/ltxcmds/ltxcmds.
+sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/pdftexcmds/pdfte
+xcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/infwarerr/infwar
+err.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode not found.
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/kvsetkeys/kvsetk
+eys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/kvdefinekeys/kvd
+efinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/pdfescape/pdfesc
+ape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hycolor/hycolor.st
+y
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/letltxmacro/letltx
+macro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/auxhook/auxhook.st
+y
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/kvoptions/kvoption
+s.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+)
+\@linkdim=\dimen185
+\Hy@linkcounter=\count296
+\Hy@pagecounter=\count297
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.de
+f
+File: pd1enc.def 2021-02-10 v7.00j Hyperref: PDFDocEncoding definition (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref-
+langpatches.def
+File: hyperref-langpatches.def 2021-02-10 v7.00j Hyperref: patches for babel la
+nguages
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.
+sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/etexcmds/etexcmd
+s.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+\Hy@SavedSpaceFactor=\count298
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2021-02-10 v7.00j Hyperref: PDF Unicode definition (HO)
+)
+Package hyperref Info: Hyper figures OFF on input line 4192.
+Package hyperref Info: Link nesting OFF on input line 4197.
+Package hyperref Info: Hyper index ON on input line 4200.
+Package hyperref Info: Plain pages OFF on input line 4207.
+Package hyperref Info: Backreferencing OFF on input line 4212.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4445.
+\c@Hy@tempcnt=\count299
+LaTeX Info: Redefining \url on input line 4804.
+\XeTeXLinkMargin=\dimen186
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/bitset/bitset.st
+y
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/bigintcalc/bigin
+tcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count300
+\Field@Width=\dimen187
+\Fld@charsize=\dimen188
+Package hyperref Info: Hyper figures OFF on input line 6075.
+Package hyperref Info: Link nesting OFF on input line 6080.
+Package hyperref Info: Hyper index ON on input line 6083.
+Package hyperref Info: backreferencing OFF on input line 6090.
+Package hyperref Info: Link coloring OFF on input line 6095.
+Package hyperref Info: Link coloring with OCG OFF on input line 6100.
+Package hyperref Info: PDF/A mode OFF on input line 6105.
+LaTeX Info: Redefining \ref on input line 6145.
+LaTeX Info: Redefining \pageref on input line 6149.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/atbegshi-ltx.
+sty
+Package: atbegshi-ltx 2020/08/17 v1.0a Emulation of the original atbegshi packa
+ge
+with kernel methods
+)
+\Hy@abspage=\count301
+\c@Item=\count302
+\c@Hfootnote=\count303
+)
+Package hyperref Info: Driver (autodetected): hxetex.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hxetex.de
+f
+File: hxetex.def 2021-02-10 v7.00j Hyperref driver for XeTeX
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/stringenc/string
+enc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
+)
+)
+\pdfm@box=\box53
+\c@Hy@AnnotLevel=\count304
+\HyField@AnnotCount=\count305
+\Fld@listcount=\count306
+\c@bookmark@seq@number=\count307
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rer
+unfilecheck.sty
+Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/atveryend-ltx
+.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atvery packag
+e
+with kernel methods
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/uniquecounter/un
+iquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+86.
+)
+\Hy@SectionHShift=\skip75
+) (c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/units/units.sty
+Package: units 1998/08/04 v0.9b Typesetting units
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/units/nicefrac.sty
+Package: nicefrac 1998/08/04 v0.9b Nice fractions
+\L@UnitsRaiseDisplaystyle=\skip76
+\L@UnitsRaiseTextstyle=\skip77
+\L@UnitsRaiseScriptstyle=\skip78
+)) (c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/babel/babel.s
+ty
+Package: babel 2021/02/22 3.54 The Babel package
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2021/02/22 3.54 Babel common definitions
+\babel@savecnt=\count308
+\U@D=\dimen189
+\l@babelnohyphens=\language5
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/babel/xebabel.de
+f
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/babel/txtbabel.d
+ef))
+\bbl@readstream=\read2
+)
+\bbl@dirlevel=\count309
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/babel-czech/czec
+h.ldf
+Language: czech 2008/07/06 v3.1a Czech support from the babel system
+\cs@wordlen=\count310
+))
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/microtyp
+e.sty
+Package: microtype 2021/02/25 v2.8b Micro-typographical refinements (RS)
+\MT@toks=\toks26
+\MT@count=\count311
+LaTeX Info: Redefining \textls on input line 788.
+\MT@outer@kern=\dimen190
+LaTeX Info: Redefining \textmicrotypecontext on input line 1358.
+\MT@listname@count=\count312
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/microtyp
+e-xetex.def
+File: microtype-xetex.def 2021/02/25 v2.8b Definitions specific to xetex (RS)
+LaTeX Info: Redefining \lsstyle on input line 254.
+)
+Package microtype Info: Loading configuration file microtype.cfg.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/microtyp
+e.cfg
+File: microtype.cfg 2021/02/25 v2.8b microtype main configuration file (RS)
+))
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/longtable.st
+y
+Package: longtable 2020/01/07 v4.13 Multi-page Table package (DPC)
+\LTleft=\skip79
+\LTright=\skip80
+\LTpre=\skip81
+\LTpost=\skip82
+\LTchunksize=\count313
+\LTcapwidth=\dimen191
+\LT@head=\box54
+\LT@firsthead=\box55
+\LT@foot=\box56
+\LT@lastfoot=\box57
+\LT@cols=\count314
+\LT@rows=\count315
+\c@LT@tables=\count316
+\c@LT@chunks=\count317
+\LT@p@ftn=\toks27
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/multicol.sty
+Package: multicol 2019/12/09 v1.8y multicolumn formatting (FMi)
+\c@tracingmulticols=\count318
+\mult@box=\box58
+\multicol@leftmargin=\dimen192
+\c@unbalance=\count319
+\c@collectmore=\count320
+\doublecol@number=\count321
+\multicoltolerance=\count322
+\multicolpretolerance=\count323
+\full@width=\dimen193
+\page@free=\dimen194
+\premulticols=\dimen195
+\postmulticols=\dimen196
+\multicolsep=\skip83
+\multicolbaselineskip=\skip84
+\partial@page=\box59
+\last@line=\box60
+\maxbalancingoverflow=\dimen197
+\mult@rightbox=\box61
+\mult@grightbox=\box62
+\mult@gfirstbox=\box63
+\mult@firstbox=\box64
+\@tempa=\box65
+\@tempa=\box66
+\@tempa=\box67
+\@tempa=\box68
+\@tempa=\box69
+\@tempa=\box70
+\@tempa=\box71
+\@tempa=\box72
+\@tempa=\box73
+\@tempa=\box74
+\@tempa=\box75
+\@tempa=\box76
+\@tempa=\box77
+\@tempa=\box78
+\@tempa=\box79
+\@tempa=\box80
+\@tempa=\box81
+\@tempa=\box82
+\@tempa=\box83
+\@tempa=\box84
+\@tempa=\box85
+\@tempa=\box86
+\@tempa=\box87
+\@tempa=\box88
+\@tempa=\box89
+\@tempa=\box90
+\@tempa=\box91
+\@tempa=\box92
+\@tempa=\box93
+\@tempa=\box94
+\@tempa=\box95
+\@tempa=\box96
+\@tempa=\box97
+\@tempa=\box98
+\@tempa=\box99
+\@tempa=\box100
+\@tempa=\box101
+\c@minrows=\count324
+\c@columnbadness=\count325
+\c@finalcolumnbadness=\count326
+\last@try=\dimen198
+\multicolovershoot=\dimen199
+\multicolundershoot=\dimen256
+\mult@nat@firstbox=\box102
+\colbreak@box=\box103
+\mc@col@check@num=\count327
+) (c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/ulem/ulem.sty
+\UL@box=\box104
+\UL@hyphenbox=\box105
+\UL@skip=\skip85
+\UL@hook=\toks28
+\UL@height=\dimen257
+\UL@pe=\count328
+\UL@pixel=\dimen258
+\ULC@box=\box106
+Package: ulem 2019/11/18
+\ULdepth=\dimen259
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/morefloats/moreflo
+ats.sty
+Package: morefloats 2015/07/22 v1.0h Raise limit of unprocessed floats (HMM)
+Package morefloats Info: Maximum number of possible floats asked for: 36
+(morefloats)             (i.e. 18 more floats).
+(morefloats)             LaTeX might run out of memory before this
+(morefloats)             (in which case it will notify you).
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/setspace/setspace.
+sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+) (./02_ucitele_ZS_SS_600146651.aux)
+\openout1 = `02_ucitele_ZS_SS_600146651.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 112.
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
+12.
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/ts1cmr.fd
+File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+
+Package fontspec Info: Adjusting the maths setup (use [no-math] to avoid
+(fontspec)             this).
+
+\symlegacymaths=\mathgroup6
+LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 112.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 112.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 112.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 112.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 112.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 112.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 112.
+LaTeX Font Info:    Redeclaring math accent \check on input line 112.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 112.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 112.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 112.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 112.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 112.
+LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
+(Font)              `operators' in the math version `normal' on input line 112.
+
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> TU/Roboto(0)/m/n on input line 112.
+LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
+(Font)              `operators' in the math version `bold' on input line 112.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> TU/Roboto(0)/m/n on input line 112.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  TU/Roboto(0)/m/n --> TU/Roboto(0)/m/n on input line 112
+.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> TU/Roboto(0)/m/it on input line 112.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> TU/Roboto(0)/b/n on input line 112.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 112.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> TU/Roboto(1)/m/n on input line 112.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  TU/Roboto(0)/m/n --> TU/Roboto(0)/b/n on input line 112
+.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> TU/Roboto(0)/b/it on input line 112.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 112.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> TU/Roboto(1)/b/n on input line 112.
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+*geometry* verbose mode - [ preamble ] result:
+* driver: xetex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: includehead 
+* h-part:(L,W,R)=(85.35826pt, 426.79135pt, 85.35826pt)
+* v-part:(T,H,B)=(56.9055pt, 702.78308pt, 85.35826pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=426.79135pt
+* \textheight=656.63986pt
+* \oddsidemargin=13.08827pt
+* \evensidemargin=13.08827pt
+* \topmargin=-15.36449pt
+* \headheight=25.0pt
+* \headsep=34.14322pt
+* \topskip=12.0pt
+* \footskip=34.14322pt
+* \marginparwidth=35.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: hyperref package is loaded.
+Package caption Info: longtable package is loaded.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/caption/ltcaption.
+sty
+Package: ltcaption 2020/05/30 v1.4b longtable captions (AR)
+)
+Package caption Info: Fixing longtable code of `floatrow' package.
+Package caption Info: End \AtBeginDocument code.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2020/02/24 v1.2b Standard LaTeX Color (DPC)
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color
+.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: xetex.def on input line 147.
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/floatrow/fr-longta
+ble.sty
+Package: fr-longtable 2007/11/28 v0.1b (beta) floatrow: additions for longtable
+
+\flrow@LT@lasthead=\box107
+\flrow@LT@prelastfoot=\box108
+\c@FBLTpage=\count329
+)
+Package hyperref Info: Link coloring OFF on input line 112.
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.s
+ty
+Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
+
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/refcount/refcount.
+sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/gettitlestring/g
+ettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+)
+\c@section@level=\count330
+)
+LaTeX Info: Redefining \ref on input line 112.
+LaTeX Info: Redefining \pageref on input line 112.
+LaTeX Info: Redefining \nameref on input line 112.
+(./02_ucitele_ZS_SS_600146651.out) (./02_ucitele_ZS_SS_600146651.out)
+\@outlinefile=\write3
+\openout3 = `02_ucitele_ZS_SS_600146651.out'.
+
+LaTeX Info: Redefining \microtypecontext on input line 112.
+Package microtype Info: Character protrusion enabled (level 2).
+Package microtype Info: Using default protrusion set `alltext'.
+Package microtype Info: No adjustment of tracking.
+Package microtype Info: No adjustment of spacing.
+Package microtype Info: No adjustment of kerning.
+Package microtype Info: Redefining babel's language switching commands.
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `Roboto' (encoding: TU).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+LaTeX Font Info:    Font shape `TU/Roboto(0)/b/n' will be
+(Font)              scaled to size 9.78955pt on input line 130.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/b/n' will be
+(Font)              scaled to size 20.297pt on input line 130.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/it' will be
+(Font)              scaled to size 9.78955pt on input line 135.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/it' will be
+(Font)              scaled to size 14.09694pt on input line 135.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 11.74745pt on input line 139.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 8.15796pt on input line 149.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 5.71057pt on input line 149.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 149
+.
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-msa.c
+fg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 149
+.
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-msb.c
+fg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
+(c:/Users/netik/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-cmr.c
+fg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
+(RS)
+)
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 4.07898pt on input line 149.
+LaTeX Font Info:    Font shape `TU/Roboto(1)/m/n' will be
+(Font)              scaled to size 8.15796pt on input line 149.
+[1
+
+]
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 14.09694pt on input line 158.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/b/n' will be
+(Font)              scaled to size 14.09694pt on input line 158.
+[1]
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 20.297pt on input line 165.
+(./02_ucitele_ZS_SS_600146651.toc
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 6.52637pt on input line 6.
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/n' will be
+(Font)              scaled to size 4.89478pt on input line 6.
+)
+\tf@toc=\write4
+\openout4 = `02_ucitele_ZS_SS_600146651.toc'.
+
+[2
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 173--173
+[][]\TU/Roboto(1)/m/n/10 Jednotlivým kategoriím odpovědí se přiřazují přirozená
+, po sobě jsoucí čísla. Např. „rozhodně nesouhlasím –
+ []
+
+LaTeX Font Info:    Font shape `TU/Roboto(0)/m/it' will be
+(Font)              scaled to size 8.15796pt on input line 173.
+
+Underfull \hbox (badness 10000) in paragraph at lines 173--173
+[][]\TU/Roboto(1)/m/n/10 Pokud bychom seřadili výsledky jednotlivých učitelů po
+dle počtu bodů v dané škále, pak medián označuje hodnotu
+ []
+
+File: figures/boxplot_description.pdf Graphic file (type pdf)
+<use figures/boxplot_description.pdf>
+[3
+
+]
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[4]
+File: figs/scales1to4-1.pdf Graphic file (type pdf)
+<use figs/scales1to4-1.pdf>
+File: figs/scales1to6-1.pdf Graphic file (type pdf)
+<use figs/scales1to6-1.pdf>
+[5
+
+]
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[6]
+File: figs/likert-1.pdf Graphic file (type pdf)
+<use figs/likert-1.pdf>
+File: figs/midpoint-1.pdf Graphic file (type pdf)
+<use figs/midpoint-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[7]
+File: figs/mentoring-1.pdf Graphic file (type pdf)
+<use figs/mentoring-1.pdf>
+File: figs/profDevelop-1.pdf Graphic file (type pdf)
+<use figs/profDevelop-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[8]
+File: figs/feedback-1.pdf Graphic file (type pdf)
+<use figs/feedback-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[9]
+File: figs/sex-1.pdf Graphic file (type pdf)
+<use figs/sex-1.pdf>
+File: figs/age-1.pdf Graphic file (type pdf)
+<use figs/age-1.pdf>
+File: figs/career-1.pdf Graphic file (type pdf)
+<use figs/career-1.pdf>
+File: figs/job-1.pdf Graphic file (type pdf)
+<use figs/job-1.pdf>
+[10
+
+]
+File: figs/yearsTeach-1.pdf Graphic file (type pdf)
+<use figs/yearsTeach-1.pdf>
+File: figs/s8q2-1.pdf Graphic file (type pdf)
+<use figs/s8q2-1.pdf>
+File: figs/subjects-1.pdf Graphic file (type pdf)
+<use figs/subjects-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[11]
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[12]
+File: figs/tots1q1T3STUDappdx-1.pdf Graphic file (type pdf)
+<use figs/tots1q1T3STUDappdx-1.pdf>
+File: figs/tots1q3T3TEAMappdx-1.pdf Graphic file (type pdf)
+<use figs/tots1q3T3TEAMappdx-1.pdf>
+[13
+
+]
+File: figs/tots1q4weakappdx-1.pdf Graphic file (type pdf)
+<use figs/tots1q4weakappdx-1.pdf>
+File: figs/tots2q1T3COOPappdx-1.pdf Graphic file (type pdf)
+<use figs/tots2q1T3COOPappdx-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[14]
+File: figs/tots2q2T3SELFappdx-1.pdf Graphic file (type pdf)
+<use figs/tots2q2T3SELFappdx-1.pdf>
+File: figs/tots4q3leaderappdx-1.pdf Graphic file (type pdf)
+<use figs/tots4q3leaderappdx-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[15]
+File: figs/tots6q1T3WELSappdx-1.pdf Graphic file (type pdf)
+<use figs/tots6q1T3WELSappdx-1.pdf>
+File: figs/tots6q2T3WLOADappdx-1.pdf Graphic file (type pdf)
+<use figs/tots6q2T3WLOADappdx-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[16]
+File: figs/tots6q4T3JSENVappdx-1.pdf Graphic file (type pdf)
+<use figs/tots6q4T3JSENVappdx-1.pdf>
+File: figs/tots7q1teachperceptappdx-1.pdf Graphic file (type pdf)
+<use figs/tots7q1teachperceptappdx-1.pdf>
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[17]
+File: logos/eduzmena.pdf Graphic file (type pdf)
+<use logos/eduzmena.pdf>
+File: logos/schola.pdf Graphic file (type pdf)
+<use logos/schola.pdf>
+
+Package fancyhdr Warning: \headheight is too small (25.0pt): 
+(fancyhdr)                Make it at least 39.34956pt, for example:
+(fancyhdr)                \setlength{\headheight}{39.34956pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.34956pt}.
+
+[18] (./02_ucitele_ZS_SS_600146651.aux)
+Package rerunfilecheck Info: File `02_ucitele_ZS_SS_600146651.out' has not chan
+ged.
+(rerunfilecheck)             Checksum: 6D79D58147188F77064B078F6CBF2C7E;871.
+ ) 
+Here is how much of TeX's memory you used:
+ 16522 strings out of 478937
+ 311091 string characters out of 5865498
+ 709721 words of memory out of 5000000
+ 36045 multiletter control sequences out of 15000+600000
+ 412001 words of font info for 88 fonts, out of 8000000 for 9000
+ 19 hyphenation exceptions out of 8191
+ 81i,15n,123p,1306b,415s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on 02_ucitele_ZS_SS_600146651.pdf (19 pages).

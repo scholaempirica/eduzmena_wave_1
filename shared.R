@@ -9,66 +9,22 @@
 project_title <- "Eduzměna – první vlna"
 gd_url <- "https://drive.google.com/drive/u/1/folders/1L4lxXbit5nbMbr98WGGn7TXDFffisGDV"
 
-limesurvey_api <- "http://dotazniky.scholaempirica.org/limesurvey/index.php/admin/remotecontrol"
-
-# limesurvey username
-ls_cred <- function(type = "user") {
-  if (!type %in% c("user", "pass", "reset")) {
-    stop('Only "user", "pass" or "reset" values are allowed!', call. = FALSE)
-  }
-  if (type != "reset") {
-    cred <- ifelse(type == "user", Sys.getenv("LS_USER"), Sys.getenv("LS_PASS"))
-    if (nzchar(cred)) {
-      message(
-        "Using LimeSurvey ",
-        switch(type,
-          "user" = "username",
-          "pass" = "password"
-        ), " from .Renviron."
-      )
-      return(cred)
-    } else {
-      cred <- if (type == "user") {
-        rstudioapi::showPrompt(
-          "LimeSurvey username",
-          "It seems you have no LimeSurvey username stored in .Renviron, please enter it here."
-        )
-      } else {
-        rstudioapi::askForPassword("LimeSurvey password")
-      }
-      ifelse(type == "user", Sys.setenv(LS_USER = cred), Sys.setenv(LS_PASS = cred))
-      message(
-        "Your LimeSurvey ",
-        switch(type,
-          "user" = "username",
-          "pass" = "password"
-        ), " should now be stored in .Renviron for further use."
-      )
-      return(cred)
-    }
-  } else {
-    Sys.unsetenv("LS_USER")
-    Sys.unsetenv("LS_PASS")
-    message("Limesurvey credentials have been reset!")
-  }
-}
-
 # GMAIL auth
 gmail_cred <- function(type = c("user", "pass", "name", "reset")) {
   type <- rlang::arg_match(type)
   if (type != "reset") {
     cred <- switch(type,
-                   "user" = Sys.getenv("GMAIL_USER"),
-                   "pass" = Sys.getenv("GMAIL_PASS"),
-                   "name" = Sys.getenv("GMAIL_NAME")
+      "user" = Sys.getenv("GMAIL_USER"),
+      "pass" = Sys.getenv("GMAIL_PASS"),
+      "name" = Sys.getenv("GMAIL_NAME")
     )
     if (nzchar(cred)) {
       message(
         "Using Gmail/GSuite ",
         switch(type,
-               "user" = "username",
-               "pass" = "password",
-               "name" = "name"
+          "user" = "username",
+          "pass" = "password",
+          "name" = "name"
         ), " from .Renviron."
       )
       return(cred)
@@ -87,16 +43,16 @@ gmail_cred <- function(type = c("user", "pass", "name", "reset")) {
         )
       }
       switch(type,
-             "user" = Sys.setenv(GMAIL_USER = cred),
-             "pass" = Sys.setenv(GMAIL_PASS = cred),
-             "name" = Sys.setenv(GMAIL_NAME = cred)
+        "user" = Sys.setenv(GMAIL_USER = cred),
+        "pass" = Sys.setenv(GMAIL_PASS = cred),
+        "name" = Sys.setenv(GMAIL_NAME = cred)
       )
       message(
         "Your Gmail/GSuite ",
         switch(type,
-               "user" = "username",
-               "pass" = "password",
-               "name" = "name"
+          "user" = "username",
+          "pass" = "password",
+          "name" = "name"
         ), " should now be stored in .Renviron for further use."
       )
       return(cred)
@@ -116,33 +72,6 @@ remove_empty_at <- function(df, vars) {
   return(df[keep_mask, , drop = FALSE])
 }
 
-# better compilation function - auto saves all files in project and if everything OK, opens up the report in Word
-compile_and_open <-
-  function(report, open_success = TRUE, output_dir = 'reports-output', ...) {
-    result <- tryCatch({
-      {
-        if (rstudioapi::isAvailable()) {
-          rstudioapi::documentSaveAll()
-          rstudioapi::executeCommand("activateConsole")
-        }
-        rmarkdown::render(report, output_dir = output_dir, ...)
-      }
-    }, error = function(e) {
-      message(
-        "ERROR: Report compilation failed with message:\n----------------------------------------------"
-      )
-      message(e)
-      return("fail")
-    })
-
-    if (result != "fail" & open_success == TRUE) {
-      system2("open", result)
-    } else if (result == "fail" & open_success == TRUE) {
-      message("Compilation failed, nothing to open!")
-    } else {
-      message("If you want the successufuly compiled report(s)\nto open automatically, please state it with\n'open_success = TRUE' argument.")
-    }
-  }
 
 # wrong IDs detection
 if (packageVersion("dplyr") < 1) {
@@ -156,14 +85,14 @@ if (packageVersion("dplyr") < 1) {
         summarise(n = n_distinct(!!var, na.rm = T)) %>%
         filter(n > 1) %>%
         pull(!!id) %>%
-        unique
+        unique()
     } else if (type %in% c("nonrepeating", "nr")) {
       df %>%
         filter(!is.na(!!var)) %>%
         count(!!id, !!var) %>%
         filter(n > 1) %>%
         pull(!!id) %>%
-        unique
+        unique()
     }
   }
 } else {
@@ -178,14 +107,14 @@ if (packageVersion("dplyr") < 1) {
         summarise(across(!!var, dplyr::n_distinct, na.rm = T)) %>%
         filter(!!var > 1) %>%
         pull(!!id) %>%
-        unique
+        unique()
     } else if (type %in% c("nonrepeating", "nr")) {
       df %>%
         filter(!is.na(!!var)) %>%
         count(!!id, !!var) %>%
         filter(n > 1) %>%
         pull(!!id) %>%
-        unique
+        unique()
     }
   }
 }
@@ -196,7 +125,8 @@ spot_superagers <- function(df, id, date_var, var) {
   date_var <- enquo(date_var)
   var <- enquo(var)
 
-  df %>% group_by(!!id) %>%
+  df %>%
+    group_by(!!id) %>%
     arrange(!!date_var) %>%
     nest() %>%
     mutate(invalid = map(.x = data, .f = ~ diff(eval(
@@ -224,7 +154,9 @@ fct_nanify <- function(f, nanify) {
 }
 
 drop_dontknow <- function(f, nanify) {
-  nanified <- f %>% fct_nanify(nanify) %>% as.integer
+  nanified <- f %>%
+    fct_nanify(nanify) %>%
+    as.integer()
   nanified <- nanified - 1 # subtract 1 to ger rid of dontknow category
   nanified
 }
@@ -332,46 +264,9 @@ fct_exprel <- function(f, ...) {
 }
 
 
-
-# czech dates declension -------------------------------------------------
-
-month_czech <- function(month, case = c("nominative", "locative", "genitive")) {
-  declensed <- switch(match.arg(case),
-    "nominative" = c(
-      "leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec"
-    ),
-    "locative" = c(
-      "lednu", "únoru", "březnu", "dubnu", "květnu", "červnu", "červenci", "srpnu", "září", "říjnu", "listopadu", "prosinci"
-    ),
-    "genitive" = c(
-      "ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"
-    )
-  )
-
-  month <- month(month)
-  declensed[month]
-}
-
-
-interval_print <- function(x, y) {
-  days <- unique(day(c(x, y)))
-  months <- unique(month(c(x, y)))
-  years <- unique(year(c(x, y)))
-
-  if (length(days) != 1 & length(months) == 1 & length(years) == 1) {
-    paste0(days[1], ".–", days[2], ". ", month_czech(months[1], "gen"), " ", years[1])
-  } else if (length(days) != 1 & length(months) != 1 & length(years) == 1) {
-    paste0(days[1], ". ", month_czech(months[1], "gen"), " – ", days[2], ". ", month_czech(months[2], "gen"), " ", years[1])
-  } else if (length(days) != 1 & length(months) != 1 & length(years) != 1) {
-    paste0(days[1], ". ", month_czech(months[1], "gen"), " ", years[1], " – ", days[2], ". ", month_czech(months[2], "gen"), " ", years[2])
-  } else if (length(days) == 1 & length(months) != 1 & length(years) == 1) {
-    paste0(days[1], ". ", month_czech(months[1], "gen"), " – ", days[1], ". ", month_czech(months[2], "gen"), " ", years[1])
-  } else {
-    stop("Maturing lifecycle, case not yet defined...")
-  }
-}
+# statistical mode --------------------------------------------------------
 
 stat_mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
-} #statistical mode
+}

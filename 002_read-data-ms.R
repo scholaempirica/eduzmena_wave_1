@@ -4,36 +4,13 @@ library(janitor) # clean names
 library(here)
 library(lubridate)
 
-
-# load the megadatabase of all institutions and save separate relevant data
-# (so we do not use too much memory and manipulating the dataset will be faster)
-read_rds(here("data-input/institutions.rds")) %>%
-  filter(typ_izo_nazev == "MS") %>%
-  transmute(
-    red_izo = as.character(red_izo), ico, nazev = nazev_1,
-    nazev_simple = nazev_2, druh_zarizeni = typ_izo_nazev, email = email_1
-  ) %>%
-  write_rds(here("data-input/institutions_digest.rds"))
-
-
-# from LS API, foramtted with R syntax file from LS (see 001_retrieve-data.R)
-ms <- read_rds(here("data-input/ms_wave_1.rds"))
-ms_particip <- read_rds(here("data-input/ms_wave_1_participants.rds"))
-
-# token is duplicated (read_csv repairs it automatically, read_RDS does not)
-colnames(ms) <- make.unique(colnames(ms), sep = "_")
+# both responses and respondents
+d <- read_rds(here("data-input/ucitele_reditele_MS_wave1.rds"))
 
 # separate item labels (some operations strip them out)
-item_labels <- attributes(ms)$variable.labels
-names(item_labels) <- colnames(ms)
+item_labels <- attributes(d)$variable.labels
+names(item_labels) <- colnames(d)
 item_labels %<>% as_tibble_row %>% clean_names() # harmonize colnames with below
-
-# participant info is packed data.frame
-ms_particip %<>% unpack(participant_info)
-
-
-# to main dataframe
-d <- left_join(ms, ms_particip, by = "token")
 
 
 # clean unnecessary cols and "tidy" the dataframe
@@ -51,7 +28,7 @@ d %<>% select(
     # submitdate,
     # seed,
     startlanguage,
-    language,
+    # language,
     # startdate,
     tid,
     id,
@@ -75,7 +52,7 @@ d %<>%
     submitted,
     closed,
     lastpage,
-    number_invited,
+    # number_invited,
     starts_with("s"),
     -startdate,
     -submitdate,
@@ -126,6 +103,9 @@ item_labels[intersect(names(d), names(item_labels))] %>%
 
 # mark empty strings as NAs
 d %<>% mutate_if(is.character, ~na_if(., ""))
+
+# remove useles variable labels
+attr(d, "variable.labels") <- NULL
 
 # write RDS (empty rows are removed)
 d %>%  # remove_empty_at(-c(red_izo, email, token)) %>%

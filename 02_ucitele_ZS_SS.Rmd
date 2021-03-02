@@ -107,7 +107,7 @@ opened_not_sumbitted <- d %>%
 
 completed <- opened_count - opened_not_sumbitted
 
-response_rate <- percent(completed/total_teachers, 1, suffix = "\u00A0%", decimal.mark = ",") # or /total_invited if available
+response_rate <- percent(completed/total_invited, 1, suffix = "\u00A0%", decimal.mark = ",")
 
 last_pages_not_submitted <- d %>%
   filter(!is.na(opened) & is.na(submitted)) %>%

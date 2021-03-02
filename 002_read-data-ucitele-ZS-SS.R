@@ -7,14 +7,17 @@ library(here)
 # ucitele ZS SS wave1 -----------------------------------------------------
 # osloveni reditely
 invitation <- read_rds(here("data-input/ucitele_ZS_SS_wave1_osloveni.rds")) %>%
-  transmute(token, red_izo_from_invitation = redizo, group = `int/kontrol`, number_invited = pocet)
+  rename(red_izo_from_invitation = redizo) %>%
+  transmute(token, red_izo_from_invitation, group = `int/kontrol`, number_invited = pocet)
 
 # add redizo from invitation and number invited to the participants table
-teachers_participants <- read_rds("data-input/ucitele_ZS_SS_wave1_participants.rds")
+teachers_participants <- read_rds("data-input/ucitele_ZS_SS_wave1_participants.rds") %>%
+  rename(red_izo_from_participants = redizo)
 teachers_participants <- left_join(teachers_participants, invitation, by = "token")
 
 # from LS API, formatted with R syntax file from LS (see 001_retrieve-data.R)
-teachers <- read_rds(here("data-input/ucitele_ZS_SS_wave1.rds"))
+teachers <- read_rds(here("data-input/ucitele_ZS_SS_wave1.rds")) %>%
+  rename(red_izo_from_responses = izo)
 
 # separate item labels (some operations strip them out)
 item_labels <- attributes(teachers)$variable.labels
@@ -52,13 +55,14 @@ df %<>% select(
 
 df %<>%
   mutate(
-    red_izo = redizo,
     opened = ymd_hms(startdate),
     submitted = ymd_hms(submitdate),
     closed = ymd_hms(datestamp)
   ) %>%
   select(
-    red_izo,
+    red_izo_from_invitation,
+    red_izo_from_participants,
+    red_izo_from_responses,
     token,
     opened,
     submitted,
@@ -68,8 +72,7 @@ df %<>%
     starts_with("s"),
     -startdate,
     -submitdate,
-    -datestamp,
-    -redizo
+    -datestamp
   ) %>%
   rename(
     last_page = lastpage
@@ -89,12 +92,6 @@ repaired_names <- df %>%
 
 names(df) <- repaired_names
 
-# not necessary as classes are already set properly
-df %<>%
-  mutate(
-    red_izo = as.character(red_izo)
-  )
-
 # repair "_sqxxx" endings to be compatible with the questionnaire
 repaired_names <- item_labels %>%
   names() %>%
@@ -111,16 +108,16 @@ names(item_labels) <- repaired_names
 
 # write item labels list (only items present in exported dataset)
 item_labels[intersect(names(df), names(item_labels))] %>%
-  as.list %>%
+  as.list() %>%
   write_rds(here("data-processed", "ucitele_ZS_SS_wave1_labels.rds"))
 
 # mark empty strings as NAs
-df %<>% mutate_if(is.character, ~na_if(., ""))
+df %<>% mutate_if(is.character, ~ na_if(., ""))
 
 attr(df, "variable.labels") <- NULL
 
 # write RDS (empty rows are removed)
-df %>%# remove_empty_at(-c(red_izo, email, token)) %>%
+df %>% # remove_empty_at(-c(red_izo, email, token)) %>%
   write_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds"))
 
 
@@ -217,17 +214,16 @@ names(item_labels) <- repaired_names
 
 # write item labels list (only items present in exported dataset)
 item_labels[intersect(names(df), names(item_labels))] %>%
-  as.list %>%
+  as.list() %>%
   write_rds(here("data-processed", "reditele_ZS_SS_wave1_labels.rds"))
 
 # mark empty strings as NAs
-df %<>% mutate_if(is.character, ~na_if(., ""))
+df %<>% mutate_if(is.character, ~ na_if(., ""))
 
 # remove labels that might be disruptive
 
 attr(df, "variable.labels") <- NULL
 
 # write RDS (empty rows are removed)
-df %>%# remove_empty_at(-c(red_izo, email, token)) %>%
+df %>% # remove_empty_at(-c(red_izo, email, token)) %>%
   write_rds(here("data-processed", "reditele_ZS_SS_wave1.rds"))
-

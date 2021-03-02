@@ -5,6 +5,16 @@ library(assertr)
 
 df <- read_rds(here("data-processed/ucitele_ZS_SS_wave1.rds"))
 
+
+# coalesce redizos
+df <- df %>% mutate(red_izo = coalesce(
+  red_izo_from_invitation,
+  red_izo_from_participants,
+  red_izo_from_responses
+))
+
+
+
 # new var -  those with large body of unanswered items
 # df$n_miss <- rowSums(is.na(df))
 # df %<>% filter(n_miss < 30)

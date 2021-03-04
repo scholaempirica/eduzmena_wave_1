@@ -1,5 +1,8 @@
 \documentclass[12pt,a4paper,$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
 
+\usepackage{perpage} %the perpage package
+\MakePerPage{footnote} %the perpage package command
+
 % ams
 \usepackage{amssymb,amsmath}
 
@@ -92,7 +95,7 @@ $endif$
 
 % use babel whatever engine is used
 $if(lang)$
-  \usepackage[shorthands=off,$for(babel-otherlangs)$$babel-otherlangs$,$endfor$main=$babel-lang$]{babel}
+  \usepackage[$for(babel-otherlangs)$$babel-otherlangs$,$endfor$main=$babel-lang$]{babel}
 \addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
 \addto\captionsczech{\renewcommand{\figurename}{Graf}}
 $if(babel-newcommands)$
@@ -176,6 +179,7 @@ $endif$
 % spacing
 \usepackage{setspace}
 
+% and or a in the list of authors according to the lang variable
 \newcommand{\tr}[2]{\ifnum\pdfstrcmp{\languagename}{czech}=0 #1\else #2\fi}
 
 % tightlist macro required by pandoc >= 1.14
@@ -201,7 +205,7 @@ $endfor$
       \includegraphics[width=4cm]{$logo_client$}%
       \hspace{1.5cm}%
       $endif$
-      \includegraphics[width=6.5cm]{$if(logo)$$logo$$endif$}%
+      \includegraphics[width=5cm]{logos/scholaLogoNew3}%
       \end{figure}
 
       \vspace{1cm}
@@ -225,7 +229,7 @@ $endfor$
       \vspace{.25cm}
 
       $if(authors)$
-      $for(authors)$$authors/allbutlast$$sep$, $endfor$ \tr{a}{and}~$authors/last$
+      $for(authors/allbutlast)$$authors$$sep$, $endfor$ \tr{a}{and}~$authors/last$
       $endif$
 
       $if(author)$

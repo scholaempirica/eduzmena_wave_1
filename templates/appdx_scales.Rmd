@@ -1,27 +1,40 @@
 ```{r {{chunk}}, fig.cap = get_labs("{{scale}}", labs_list = scales_labs_list), fig.asp = {{fig_asp}}}
 d %>%
-  select({{items_of_scale}}) %>%
-  pivot_longer(everything()) %>%
-  ggplot(aes(y = name %>%
-    fct_reorder(value %>% str_detect("{{regex}}"),
-      mean,
-      .desc = TRUE
-    ), fill = value)) +
-  geom_bar(position = "fill", col = "white", size = 1.1) +
-  scale_y_discrete(labels = function(x) get_labs(x, wrap = 50)) +
+  pivot_longer(c({{ items_of_scale }})) %>%
+  ggplot(aes(y = digest, fill = value)) +
+  geom_bar(
+    col = "white",
+    size = .7,
+    position = "fill",
+    width = 1
+  ) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_x_percent_cz(limits = c(0, 1)) +
   scale_fill_schola(
     palette = "{{palette}}", direction = 1, na_pos = "first",
     labels = function(x) str_wrap(x, width = 15)
   ) +
-  guides(fill = guide_legend(reverse = T, byrow = TRUE, ncol = 3, override.aes = list(size = NULL))) +
-  theme_schola("x",
+  facet_wrap(
+    ~ name %>%
+      fct_reorder(value %>% str_detect("{{regex}}"),
+        mean,
+        .desc = TRUE
+      ),
+    dir = "v",
+    ncol = 1,
+    labeller = schola_labeller(wrap = 115)
+  ) +
+  guides(
+    fill = guide_legend(reverse = T, byrow = TRUE, nrow = {{ legend_nrow }}, override.aes = list(size = NULL)),
+    alpha = guide_none()
+  ) +
+  theme_schola(
+    "x",
     legend.title = element_blank(),
-    legend.position = "bottom"
-    # plot.margin = unit(c(10, 6, 6 + 44, 6), "points"), # based on defaults
-    # legend.position = c(.8, -.075),
-    # legend.justification = "right"
+    legend.position = "top",
+    legend.box.spacing = unit(2, "mm"),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
+    panel.spacing = unit(0, "mm"),
+    strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
   )
-
 ```
-

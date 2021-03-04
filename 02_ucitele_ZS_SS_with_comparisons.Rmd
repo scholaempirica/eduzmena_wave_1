@@ -10,20 +10,20 @@ authors:
   - Marek Havrda
 date: '`r reschola::as_czech_date(Sys.time())`' # remove leading zero
 params:
-  redizo: "600044467" # there must be a value, to smoothly compile oustide Build script
-  pilot: true
+  redizo: "600044467" # there must be a value, to smoothly compile outside Build script
   fig_asp_body: .6
   fig_asp_appdx: .4
   alpha_lower: .6
 output: 
   reschola::schola_pdf:
     keep_tex: true # for debugging
+    keep_md: true # for debugging
     template: templates/schola_template.tex
     num_format: cs
 lang: cs # cs or en
 toc-title: "Obsah zprávy"
-logo: logos/schola # for path with _ use "`logos/schola_logo.pdf`{=latex}"
-logo_height: 15pt
+logo: logos/scholaLogoNew # for path with _ use "`logos/schola_logo.pdf`{=latex}"
+logo_height: 12pt
 logo_client: logos/eduzmena
 logo_client_height: 25pt
 head_height: false # may be used if fancyhdr complains 
@@ -47,43 +47,76 @@ source("shared.R", local = TRUE) # use the environment of the source (because of
 ```
 
 ```{r data}
-# from YAML, general lower alpha bound, how transparent the OTHERS would be
-alpha_lower <- params$alpha_lower
-
+# complete data
 d <- read_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds"))
 
-# append arbitrary teacher id
-d %<>%
-  group_by(red_izo) %>%
-  mutate(teacher_id = seq_len(n()), .after = red_izo) %>%
-  ungroup()
-
-# make unique number IDs for schools w/ specifications:
-# selected school has alway number 1 as the main identificator
-# sequence is complete, w/o interruption
-d %<>%
-  mutate(red_izo = match(red_izo, c(params$redizo, red_izo) %>% unique()) %>% as.character(), .after = red_izo)
-
-# add selectionvariable indicating selected school
-d %<>% mutate(digest = if_else(red_izo == "1", TRUE, FALSE))
+# add selection variable indicating selected school
+d %<>% mutate(digest = if_else(red_izo == params$redizo, TRUE, FALSE))
 
 # get human readable REDIZO & school name from the big database for further use
 instit_digest <- read_rds(here("data-input/institutions_ms_zs_ss.rds"))
 
 selected_school_name <- instit_digest %>%
   filter(red_izo == params$redizo) %>%
-  distinct(across(c(red_izo, fullname, name))) %>% 
+  distinct(across(c(red_izo, fullname, name))) %>%
   pull(fullname) # some shortened name are useles (e.g. "základní škola"...)
-
 ```
 
 
 
-```{r respStatsAndfiltering}
-# filter current school for respondents stats
-curr_school <- d %>% filter(red_izo == params$redizo)
+```{r missingsAndEscaped}
+d %<>% naniar::add_n_miss(matches("^s\\d.*")) # variables beginning with s followed by int
 
-total_teachers <- nrow(curr_school)
+d %<>% rowwise %>%
+  mutate(n_escape = sum(str_detect(c_across(where(is.factor)), "[N\n]evím"), na.rm = TRUE)) %>%
+  ungroup()
+
+# delete those stats in not submitted cases
+d[is.na(d$submitted), c("n_escape", "n_miss_vars")] <- NA
+```
+
+
+```{r respStatsAndfiltering}
+# resp_stats
+resp_stats <- d %>%
+  mutate(
+    n_escape_outlier = scale(n_escape) > qnorm(1 - (.05 / 2)),
+    n_miss_outlier = scale(n_miss_vars) > qnorm(1 - (.05 / 2))
+  ) %>%
+  group_by(digest, red_izo) %>%
+  summarize(
+    n_total = n(),
+    n_invited = number_invited %>% unique(),
+    n_opened = sum(!is.na(cur_data()$opened)),
+    n_submitted = sum(!is.na(cur_data()$submitted)),
+    n_opened_not_sumbitted = sum(!is.na(opened) & is.na(submitted)),
+    n_escapes_outliers = sum(n_escape_outlier),
+    n_miss_outliers = sum(n_miss_vars)
+  ) %>%
+  group_by(digest) %>%
+  summarise(across(-red_izo,
+    list(
+      med = ~ median(.x, na.rm = TRUE),
+      sum = ~ sum(.x, na.rm = TRUE)
+    ),
+    .names = "{.col}_{.fn}"
+  ))
+
+n_miss_outl <- resp_stats %>%
+  filter(digest) %>%
+  pull(n_miss_outliers_sum)
+n_esc_outl <- resp_stats %>%
+  filter(digest) %>%
+  pull(n_escapes_outliers_sum)
+
+any_outliers <- sum(n_miss_outl, n_esc_outl) != 0
+
+
+
+# filter current school for respondents stats
+curr_school <- d %>% filter(digest)
+
+total_teachers <- nrow(curr_school) # can be higher than invited
 
 total_invited <- curr_school$number_invited %>% unique()
 
@@ -97,7 +130,8 @@ opened_not_sumbitted <- curr_school %>%
 
 completed <- opened_count - opened_not_sumbitted
 
-response_rate <- percent(completed/total_invited, 1, suffix = "\u00A0%", decimal.mark = ",")
+response_rate_invited <- percent(completed / total_invited, 1, suffix = "\u00A0%", decimal.mark = ",")
+response_rate_effective <- percent(completed / total_teachers, 1, suffix = "\u00A0%", decimal.mark = ",")
 
 last_pages_not_submitted <- curr_school %>%
   filter(!is.na(opened) & is.na(submitted)) %>%
@@ -130,9 +164,8 @@ d %<>% rowwise %>%
 
 # colwise measures, escape options outliers among the sample
 escape_med <- median(d$n_escape, na.rm = TRUE)
-escape_idx <- as.logical( scale(d$n_escape) > 1.96)
+escape_idx <- as.logical(scale(d$n_escape) > 1.96)
 n_escapes_outliers <- d[escape_idx, ]$n_escape # number of escaped, not indices
-
 ```
 
 ```{r basicInfo}
@@ -152,8 +185,6 @@ opened_minmax_curr_school <- d %>%
   )
 
 survey_time_int_curr_school <- czech_date_interval(opened_minmax_curr_school$min, opened_minmax_curr_school$max)
-
-
 ```
 
 <!-- subtitle comes after we know the name of the institution selected -->
@@ -163,9 +194,15 @@ subtitle: |
   | `r selected_school_name`
   | RED IZO: `r params$redizo`
 abstract: |
-  Zpráva seznamuje čtenáře s výsledky šetření mezi učiteli v rámci projektu Eduzměna, u kterých jsme mapovali situaci v celé řadě oblastí. Šlo zejména o vnímání školního prostředí, sebehodnocení pedagogických dovedností a víru v dopady své práce, otázky seberozvoje, mentoringu a účinku zpětné vazby, vnímané autonomie a podpory ze strany vedení školy, komunikaci a spolupráci s různými aktéry, spokojenost s prací a potenciální pracovní stresory, vnímání odměny, prestiže pedagogické profese a školy jako celku. Zmíněné oblasti jsme mapovali pomocí online dotazníku, jehož sběr probíhal v rozmezí `r survey_time_int`.
+  Zpráva seznamuje s výsledky šetření mezi učiteli v rámci projektu Eduzměna, u kterých jsme mapovali situaci v celé řadě oblastí.
   
-  <!-- Pilotního šetření se zúčastnily pouze dvě školy. Kvůli naší přísné politice ochrany osobních údajů prezentujeme *výsledky pouze té vaší* (uvedené v podditulku dokumentu), neboť identitu druhé školy lze s určitou pravděpodobností odvodit. Při budoucím, "ostrém" dotazování budeme ve zprávách jednotlivé oblasti anonymně porovnávat s dalšími zúčastněnými školami, abyste dostali informaci, jak si ve srovnání s ostatními stojíte. -->
+  Šlo zejména o vnímání školního prostředí, sebehodnocení pedagogických dovedností a víru v dopady své práce, otázky seberozvoje, mentoringu a účinku zpětné vazby, vnímané autonomie a podpory ze strany vedení školy, komunikaci a spolupráci s různými aktéry, spokojenost s prací a potenciální pracovní stresory, vnímání odměny, prestiže pedagogické profese a školy jako celku.
+  
+  Zmíněné oblasti jsme mapovali pomocí online dotazníku, jehož sběr na Vaší škole probíhal `r survey_time_int_curr_school`, celé dotazníkové šetření se všemi zúčastněnými školami pak v rozmezí `r survey_time_int`.
+  
+  V první části naleznete krátký komentář k interpretaci použitých grafů, poté se věnujeme rovnou tomu nejzajímavějšímu a sice výsledkům, které jsou vždy členěny na Vaší a ostatní školy, abyste si mohli stav u Vás snadno porovnat s průměrem ostatních zapojených škol. Informace o respondentech, včetně počtu zapojených vyučujících a škol, naleznete za samotnými výsledky. Zpráva obsahuje také přílohu s detailním pohledem na otázky, které v těle zprávy prezentujeme souhrnně v tzv. škálách (viz dále).
+  
+  Přejeme Vám zajímavé a inspirativní čtení a věříme, že zpráva poslouží k dalšímu rozvoji Vaší školy a školního prostředí.
 ---
 
 
@@ -197,9 +234,9 @@ item_labs_edited <- read_delim(here("data-processed/ucitele_ZS_SS_wave1_labels.c
 )
 
 # write edited labels as the main ones
-item_labs_list <- item_labs_edited$wording %>% 
-  str_replace_all("(?<!\\w{2})\\s","\u00A0") %>% # nbsp at prepositions
-  as.list() %>% 
+item_labs_list <- item_labs_edited$wording %>%
+  str_replace_all("(?<!\\w{2})\\s", "\u00A0") %>% # nbsp at prepositions
+  as.list() %>%
   set_names(item_labs_edited$code)
 ```
 
@@ -226,9 +263,12 @@ item_labs_list %>%
 
 ```{r itemCentral, include=FALSE, echo=TRUE}
 # what types of response options do we have?
-d %>% select(matches("^s\\d")) %>% # only vars beginning with "s" followed by a number
-  map_chr(~ .x %>% levels %>% str_flatten("  |  ")) %>%
-  unique
+d %>%
+  select(matches("^s\\d")) %>% # only vars beginning with "s" followed by a number
+  map_chr(~ .x %>%
+    levels() %>%
+    str_flatten("  |  ")) %>%
+  unique()
 
 # which items are which? just FYI
 d %>%
@@ -275,7 +315,6 @@ items <- d %>%
 
 # time related items needs to have bigger fig.asp, as the legend takes considerable amount of space
 items %<>% mutate(fig_asp_appdx = if_else(resp_type == "time", fig_asp_appdx + .07, fig_asp_appdx))
-
 ```
 
 <!-- NOTE: complete redesign on Marek's request -->
@@ -294,12 +333,12 @@ Zpráva je sestavena s cílem poskytnout rychlý vhled. Tematické sekce, podle 
 Krabicový graf (pro ukázku a popis viz graf č. \@ref(fig:boxplotDesc)) přehledně zobrazuje typické hodnoty:
 
 * silnější linka vyznačuje medián,
-* šedá, vyplněná část ohraničuje 50\ % prostředních hodnot kolem mediánu (tj. mezi 25. a 75.\ percentilem, na obrázku uvedeno jako "IQR"),
+* šedá, vyplněná^[V zobrazení pro ostatní školy je tato část bílá.] část ohraničuje 50\ % prostředních hodnot kolem mediánu (tj. mezi 25. a 75.\ percentilem, na obrázku uvedeno jako "IQR"),
 * horizontální úsečky pak poukazují na 1,5násobek tohoto rozpětí.
-* Hodnoty mimo představují mimořádně odlehlá pozorování či extrémy (tvoří dohromady méně než 1 % dat).
+* Hodnoty mimo zmíněné části (vyobrazeny jako malé puntíky^[V případě, že stejnou odlehlou hodnotu zaujímá více učitelů, je puntík tmavější.]) představují mimořádně odlehlá pozorování či extrémy (tvoří dohromady méně než 1 % dat).
 Samotné hodnoty jsou na ose "x" (horizontální osa) a tato osa má vždy rozsah podle toho, kolik bodů je v dané škále možné získat.
 
-Samotné hodnoty jsou na ose "x" (horizontální osa) a tato osa má vždy rozsah podle toho, kolik bodů je v dané škále možné získat.
+Samotné hodnoty jsou na ose "x" (horizontální osa) a tato osa má vždy rozsah podle toho, kolik bodů je v dané škále možné získat. První z krabicových grafů k dané položce vždy hovoří o výsledcích Vaší školy, druhý o školách ostatních.
 
 <!-- ![Popis krabicového grafu ($\sigma$ značí směrodatnou odchylku, spodní část obrázku znázorňuje rozložení hodnot)](figures/boxplot_description.pdf) -->
 
@@ -314,13 +353,14 @@ Samotné hodnoty jsou na ose "x" (horizontální osa) a tato osa má vždy rozsa
 
 Skládaný sloupcový graf vizualizuje podíl jednotlivých odpovědí (klíč k barvám je v legendě) pro jednotlivé položky dotazníku. Čím větší plocha, tím větší má daná volba zastoupení. Osa "x" je tedy vyjádřená v procentech.
 
-Na grafu č. \@ref(fig:stackedBarPlot) můžete vidět příklad, kde je u každé položky dvojice "řádků". První a sytější vždy referuje k vaší škole, druhý ukazuje průměr všech ostatních škol, které se dotazníkového šetření účastnily. Jednotlivé položky řadíme ve zprávě vždy podle součtu dvou nejvíce pozitivních kategorií (v případě grafu č. \@ref(fig:stackedBarPlot) jde o "Určitě ano" a "Spíše ano"), jak se objevují v ostatních školách (čili v "průměru").  
+Na grafu č. \@ref(fig:stackedBarPlot) můžete vidět příklad, kde je u každé položky dvojice "řádků". První z nich, označený hvězdičkou, vždy referuje k Vaší škole, druhý ukazuje průměr všech *ostatních* škol, které se dotazníkového šetření účastnily. Jednotlivé položky řadíme ve zprávě vždy podle součtu dvou nejvíce pozitivních kategorií (v případě grafu č. \@ref(fig:stackedBarPlot) jde o "Určitě ano" a "Spíše ano"), jak se objevují v ostatních školách (čili v "průměru").  
 
 ```{r stackedBarPlot, fig.asp=.33, fig.cap="Ukázka skládaného sloupcového grafu"}
 read_rds(here("data-input/barchart_sample_data.rds")) %>%
-  ggplot(aes(y = digest,
-             fill = value,
-             alpha = digest)) +
+  ggplot(aes(
+    y = digest,
+    fill = value
+  )) +
   geom_bar(
     col = "white",
     size = .7,
@@ -328,35 +368,37 @@ read_rds(here("data-input/barchart_sample_data.rds")) %>%
     width = 1
   ) +
   scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_fill_schola(
     palette = "RdYlBu",
     direction = 1,
     na_pos = "first",
-    labels = function(x)
+    labels = function(x) {
       str_wrap(x, width = 18)
+    }
   ) +
-  scale_alpha_discrete(range = c(.5, 1)) +
   facet_wrap(
     ~ name %>% fct_reorder(value %>% str_detect("(Určitě ano)|(Spíše ano)"), mean, .desc = TRUE),
     dir = "v",
     ncol = 1
   ) +
-  guides(fill = guide_legend(
-    reverse = TRUE,
-    nrow = 1,
-    override.aes = list(size = NULL)
-  ),
-  alpha = guide_none()) +
+  guides(
+    fill = guide_legend(
+      reverse = TRUE,
+      nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
   theme_schola(
     "x",
     legend.title = element_blank(),
     legend.position = "top",
     legend.box.spacing = unit(2, "mm"),
-    axis.text.y = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
     panel.spacing = unit(0, "mm"),
     strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
   )
-
 ```
 
 
@@ -368,7 +410,8 @@ Níže prezentujeme výsledky odpovědí na otázky pro všechny škály s rozsa
 
 ```{r scalesTotScores, include=FALSE}
 scale_scores <- d %>%
-  mutate(across(c(s1q1_a:s1q1_e,
+  mutate(across(c(
+    s1q1_a:s1q1_e,
     s1q3_a:s1q3_d,
     s1q4_a:s1q4_d,
     s2q1_a:s2q1_f,
@@ -376,7 +419,8 @@ scale_scores <- d %>%
     s4q3_a:s4q3_g,
     s6q1_a:s6q2_e,
     s6q4_a:s6q4_d,
-    s7q1_a:s7q1_e), ~ .x %>%
+    s7q1_a:s7q1_e
+  ), ~ .x %>%
     drop_dontknow("Nevím / nechci odpovědět") %>% # destroy the NA without messing the values
     as.integer())) %>%
   mutate( # reverse-coded items
@@ -396,7 +440,7 @@ scale_scores <- d %>%
     tot_s2q2_T3SECLS = mean(c_across(c(s2q2_c, s2q2_e, s2q2_g, s2q2_h)), na.rm = TRUE),
     tot_s4q3_leader = mean(c_across(s4q3_a:s4q3_g), na.rm = TRUE),
     tot_s6q1_T3WELS = 5 - mean(c_across(s6q1_a:s6q1_d), na.rm = TRUE), # more points = better (unifying interpret. w/ others)
-    tot_s6q2_T3WLOAD = 5- mean(c_across(s6q2_a:s6q2_e), na.rm = TRUE), # more points = better
+    tot_s6q2_T3WLOAD = 5 - mean(c_across(s6q2_a:s6q2_e), na.rm = TRUE), # more points = better
     tot_s6q4_T3JSENV = mean(c_across(s6q4_a:s6q4_d), na.rm = TRUE),
     tot_s7q1_teach_percept = mean(c_across(s7q1_a:s7q1_e), na.rm = TRUE),
   )
@@ -419,11 +463,10 @@ scales_labs_list <- list(
 )
 
 
-# "tot_s2q1_T3COOP" 
-# "tot_s2q1_T3EXCH" 
+# "tot_s2q1_T3COOP"
+# "tot_s2q1_T3EXCH"
 # "tot_s2q1_T3COLES"
 # are 1:6, others are 1:4
-
 ```
 
 
@@ -431,9 +474,11 @@ scales_labs_list <- list(
 scale_scores %>% # select all total scores of the scales, except T3xxxx
   pivot_longer(c(
     starts_with("tot_"),
-    -c(tot_s2q1_T3COOP,
-       tot_s2q1_T3EXCH,
-       tot_s2q1_T3COLES)
+    -c(
+      tot_s2q1_T3COOP,
+      tot_s2q1_T3EXCH,
+      tot_s2q1_T3COLES
+    )
   )) %>%
   ggplot(aes(
     value,
@@ -444,7 +489,7 @@ scale_scores %>% # select all total scores of the scales, except T3xxxx
   geom_boxplot(
     col = "gray25",
     fill = "gray90",
-    size = .25,
+    size = .35,
     show.legend = FALSE,
     outlier.shape = "circle filled",
     outlier.alpha = .1,
@@ -464,7 +509,6 @@ scale_scores %>% # select all total scores of the scales, except T3xxxx
     axis.title.x = element_text(),
     plot.caption = element_text(face = "italic")
   )
-
 ```
 
 ```{r scales1to6, fig.asp=.4, fig.cap='Spolupráce mezi učiteli (škály s rozsahem 1--6 bodů)'}
@@ -479,7 +523,7 @@ scale_scores %>%
     alpha = digest
   )) +
   geom_boxplot(
-    col = "gray25", fill = "gray90", size = .25, show.legend = FALSE,
+    col = "gray25", fill = "gray90", size = .35, show.legend = FALSE,
     outlier.shape = "circle filled", outlier.alpha = .1,
     outlier.fill = "gray25", outlier.stroke = 0
   ) +
@@ -529,7 +573,6 @@ separate_items_names <- d %>%
 separate_items <- items %>% filter(item %in% separate_items_names)
 
 separate_items %>% count(levels)
-
 ```
 
 
@@ -541,7 +584,7 @@ likert_items <- separate_items %>%
 d %>%
   select(all_of(likert_items), digest) %>%
   pivot_longer(-digest) %>%
-  ggplot(aes(y = digest, fill = value, alpha = digest)) +
+  ggplot(aes(y = digest, fill = value, )) +
   geom_bar(
     col = "white",
     size = .7,
@@ -549,13 +592,14 @@ d %>%
     width = 1
   ) +
   scale_x_percent_cz(limits = c(0, 1)) +
-  scale_alpha_discrete(range = c(.5, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_fill_schola(
     palette = "RdYlBu",
     direction = 1,
     na_pos = "first",
-    labels = function(x)
+    labels = function(x) {
       str_wrap(x, width = 15)
+    }
   ) +
   facet_wrap(
     ~ name %>% fct_reorder(value %>% str_detect("(?<!e)[S|s]ouhlasím"), mean, .desc = TRUE),
@@ -563,23 +607,26 @@ d %>%
     ncol = 1,
     labeller = schola_labeller(wrap = 115)
   ) +
-  guides(fill = guide_legend(
-    reverse = T,
-    nrow = 1,
-    override.aes = list(size = NULL)
-  ),
-  alpha = guide_none()) +
+  guides(
+    fill = guide_legend(
+      reverse = T,
+      nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
   theme_schola(
     "x",
     legend.title = element_blank(),
     legend.position = "top",
     legend.box.spacing = unit(1, "mm"),
-    axis.text.y = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
     panel.spacing = unit(0, "mm"),
-    strip.text = element_text(vjust = 0,
-                              margin = margin(l = 1.1 * 11 / 2, b = 1.5))
+    strip.text = element_text(
+      vjust = 0,
+      margin = margin(l = 1.1 * 11 / 2, b = 1.5)
+    )
   )
-
 ```
 
 
@@ -592,9 +639,10 @@ midpoint_items <- separate_items %>%
 
 d %>%
   pivot_longer(all_of(midpoint_items)) %>%
-  ggplot(aes(y = digest,
-             fill = value,
-             alpha = digest)) +
+  ggplot(aes(
+    y = digest,
+    fill = value,
+  )) +
   geom_bar(
     col = "white",
     size = .7,
@@ -602,33 +650,35 @@ d %>%
     width = 1
   ) +
   scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_fill_schola(
     palette = "RdYlBu",
     direction = 1,
     na_pos = "first",
-    labels = function(x)
+    labels = function(x) {
       str_wrap(x, width = 18)
+    }
   ) +
-  scale_alpha_discrete(range = c(.5, 1)) +
   facet_wrap(
     ~ name %>% fct_reorder(value %>% str_detect("(Určitě ano)|(Spíše ano)"), mean, .desc = TRUE),
     dir = "v",
     ncol = 1,
     labeller = schola_labeller(wrap = 115)
   ) +
-  guides(fill = guide_legend(
-    reverse = TRUE,
-    nrow = 1,
-    override.aes = list(size = NULL)
-  ),
-  alpha = guide_none()) +
+  guides(
+    fill = guide_legend(
+      reverse = TRUE,
+      nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
   theme_schola(
     "x",
     legend.title = element_blank(),
     legend.position = "top",
     legend.box.spacing = unit(2, "mm"),
-    axis.text.y = element_blank(),
-    panel.spacing = unit(0, "mm"),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)), panel.spacing = unit(0, "mm"),
     strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
   )
 ```
@@ -645,7 +695,6 @@ d %>%
   ggplot(aes(
     y = digest,
     fill = value %>% fct_rev() %>% fct_relevel("Ne", "Ano", after = 1),
-    alpha = digest
   )) +
   geom_bar(
     col = "white",
@@ -654,126 +703,148 @@ d %>%
     width = 1
   ) +
   scale_x_percent_cz(limits = c(0, 1)) +
-  scale_fill_manual(values = c("darkgray", "#CA0020", "#0571B0"),
-                    drop = FALSE) +
-  scale_alpha_discrete(range = c(.5, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
+  scale_fill_manual(
+    values = c("darkgray", "#CA0020", "#0571B0"),
+    drop = FALSE
+  ) +
   facet_wrap(
     ~ name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
     dir = "v",
     ncol = 1,
     labeller = schola_labeller(wrap = 115)
   ) +
-  guides(fill = guide_legend(
-    reverse = TRUE,
-    nrow = 1,
-    override.aes = list(size = NULL)
-  ),
-  alpha = guide_none()) +
+  guides(
+    fill = guide_legend(
+      reverse = TRUE,
+      nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
   theme_schola(
     "x",
     legend.title = element_blank(),
     legend.position = "top",
     legend.box.spacing = unit(2, "mm"),
-    axis.text.y = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
     panel.spacing = unit(0, "mm"),
     strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
   )
+```
 
 
+```{r profDevelOutliers}
+d <- d %>% mutate(s3q5_outliers = if_else(scale(s3q5) > qnorm(1 - (.01 / 2)), TRUE, FALSE)) # 0.1 pval
+
+s3q5_outliers_vals_curr_school <- d %>%
+  filter(s3q5_outliers & digest) %>%
+  arrange(s3q5) %>%
+  pull(s3q5)
+
+s3q5_outliers_vals_others <- d %>%
+  filter(s3q5_outliers & !digest) %>%
+  arrange(s3q5) %>%
+  pull(s3q5)
+
+s3q5_any_outliers <- (length(s3q5_outliers_vals_curr_school) + length(s3q5_outliers_vals_others)) != 0
 ```
 
 
 ```{r profDevelop, fig.cap=tidy_labs(s3q5), fig.asp=.19}
 d %>%
-  ggplot(aes(s3q5,
-    y = red_izo %>% fct_reorder(s3q5, .desc = TRUE)
-  )) +
-  geom_boxplot(col = "gray40", fill = "gray75", alpha = .37, show.legend = FALSE, outlier.shape = NA) +
-  geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
+  filter(!s3q5_outliers) %>%
+  ggplot(aes(s3q5, digest, alpha = digest)) +
+  geom_boxplot(
+    col = "gray25", fill = "gray90", size = .35, show.legend = FALSE,
+    outlier.shape = "circle filled", outlier.alpha = .1,
+    outlier.fill = "gray25", outlier.stroke = 0
+  ) +
+  scale_alpha_discrete(range = c(0, 1)) +
   labs(x = "počet hodin") +
   theme_schola("x", axis.text.y = element_blank(), axis.title.x = element_text())
-
 ```
 
 
-```{r profDevelOutliers}
-include_info <- ifelse(identical(d$s3q5, d$s3q5_orig), FALSE, TRUE)
+```{r profDevelText, results='asis', include = s3q5_any_outliers}
+no_of_s1q5_outliers <- length(c(s3q5_outliers_vals_curr_school, s3q5_outliers_vals_others))
 
-changed_vals <- d$s3q5_orig[(d$s3q5 == d$s3q5_orig) == FALSE] %>% na.omit()
-changed_vals_edited <- d$s3q5[(d$s3q5 == d$s3q5_orig) == FALSE] %>% na.omit()
+cat(paste0(
+  "```{=latex}\n", # prevent pandoc filters from inserting NBSP
+  "Z grafu výše jsme odstranili celkem ", no_of_s1q5_outliers, " extrémně ",
+  case_when(
+    no_of_s1q5_outliers == 1 ~ "odlehlou hodnotu",
+    no_of_s1q5_outliers %in% 2:4 ~ "odlehlé hodnoty",
+    TRUE ~ "odlehlých hodnot"
+  ),
+  ", aby byl lépe čitelný. ",
 
-# 
-# devel_outliers <- as.logical(scale(d$s3q5, center = median(d$s3q5, na.rm = TRUE)) > 4)
-# d$s3q5[devel_outliers] %>% na.omit()
-# devel_outliers <- as.logical(scale(a$s3q5, center = median(a$s3q5, na.rm = TRUE)) > 4)
-# a$s3q5[devel_outliers] %>% na.omit()
+  ifelse(length(s3q5_outliers_vals_curr_school) != 0, paste0("Odlehlé hodnoty z Vaší školy: ", s3q5_outliers_vals_curr_school, ". "), "Z Vaší školy nebyly žádné takové hodnoty. "),
 
+  ifelse(length(s3q5_outliers_vals_others) != 0, paste0("Odlehlé hodnoty z ostatních škol: ", paste0(s3q5_outliers_vals_others, collapse = ", "), "."), "Z ostatních škol nebyly žádné takové hodnoty."),
+  "\n```"
+))
 ```
 
-
-```{r profDevelText, results='asis', include = include_info}
-cat(paste0('Původní odpověďi obsahovaly minimálně jednu nerealistickou hodnotu (konkrétně ', paste0(changed_vals, collapse = ", "), '). Jelikož jde pravděpodobně o překlep, provedli jsme úpravu na ', paste0(changed_vals_edited, collapse = ", "),'. '))
-```
-
-
-<!-- following chunk and its text are conditional -->
-
-<!-- ```{r feedback, fig.cap="Počty učitelů vnímajících pozitivní dopad zpětné vazby na jednotlivé aspekty jejich výuky", include = ifelse(any(d$s3q2 == "Ano"), TRUE, FALSE), fig.asp = .33} -->
-<!-- d %>% -->
-<!--   pivot_longer(s3q4_a:s3q4_f) %>% -->
-<!--   filter(value == "Ano") %>% -->
-<!--   ggplot(aes( -->
-<!--     y = red_izo, -->
-<!--     fill = name %>% as.factor() -->
-<!--   )) + -->
-<!--   geom_bar(position = "fill", col = "white", size = 1.1) + -->
-<!--   scale_x_percent_cz(limits = c(0, 1)) + -->
-<!--   scale_fill_brewer(type = "qual", labels = function(x) { -->
-<!--     get_labs(x, wrap = 35) -->
-<!--   }) + -->
-<!--   guides(fill = guide_legend(byrow = TRUE, reverse = T)) + -->
-<!--   theme_schola("x", -->
-<!--     legend.position = "bottom", legend.title = element_blank(), -->
-<!--     axis.text.y = element_blank() -->
-<!--   ) -->
-<!-- ``` -->
 
 \newpage
 
-```{r feedbackText, results='asis', include = ifelse(any(d$s3q3 == "Ano"), TRUE, FALSE)}
-pos_feedback <- d$s3q3 %>% fct_count(prop = TRUE) %>% mutate(p = scales::percent(p, 1, suffix = "\u00A0%", decimal.mark = ","))
-
-feedback_yes <-  pos_feedback %>% filter(f == "Ano")
-feedback_no <-  pos_feedback %>% filter(f == "Ne")
-
-declin_ucitel <- function(n, append_number = TRUE) {
-  declined <- case_when(
-    n == 1 ~ "učitel",
-    n %in% c(2:4) ~ "učitelé",
-    n > 4 ~ "učitelů"
-  )
-  paste(n, declined)
-}
-
-cat("Následující graf (č. \\@ref(fig:feedback)) vizualizuje odpovědi ",
-  declin_ucitel(feedback_yes$n),
-  " (",
-  feedback_yes$p,
-  "), kteří vnímají pozitivní dopad obdržené zpětné vazby na styl své výuky. Opak ",
-  ifelse(feedback_no$n > 1, "uvedli ", "uvedl "),
-  ifelse(feedback_no$n < 5, "pouze ", ""),
-  declin_ucitel(feedback_no$n),
-  " (",
-  feedback_no$p,
-  ").",
-  sep = ""
-)
+```{r whatToPlot}
+plot_comparison <- d %>%
+  filter(digest) %>%
+  pull(s3q3) %>%
+  magrittr::is_in("Ano") %>%
+  any()
 ```
 
-```{r feedback, fig.cap="Vnímání pozitivního dopadu zpětné vazby na jednotlivé aspekty výuky", include = ifelse(any(d$s3q3 == "Ano"), TRUE, FALSE), fig.asp = .55}
+
+```{r, fig.cap="Vnímání dopadu zpětné vazby", fig.asp=.25}
+d %>%
+  pivot_longer(s3q3) %>%
+  filter(!is.na(value)) %>%
+  ggplot(aes(
+    y = digest,
+    fill = value %>% fct_rev() %>% fct_relevel("Ne", "Ano", after = 1)
+  )) +
+  geom_bar(
+    col = "white",
+    size = .7,
+    position = "fill",
+    width = 1
+  ) +
+  scale_fill_manual(values = c("darkgray", "#CA0020", "#0571B0"), drop = FALSE) +
+  scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
+  facet_wrap(
+    ~ name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
+    dir = "v",
+    ncol = 1,
+    labeller = schola_labeller(wrap = 115)
+  ) +
+  guides(
+    fill = guide_legend(
+      reverse = TRUE,
+      nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
+  theme_schola(
+    "x",
+    legend.title = element_blank(),
+    legend.position = "top",
+    legend.box.spacing = unit(2, "mm"),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
+    panel.spacing = unit(0, "mm"),
+    strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
+  )
+```
+
+
+```{r feedbackSingle, include = !plot_comparison, fig.cap="Vnímání pozitivního dopadu zpětné vazby na jednotlivé aspekty výuky (pouze za ostatní školy)", fig.asp = .4}
 d %>%
   pivot_longer(s3q4_a:s3q4_f) %>%
-  filter(!is.na(value)) %>% 
+  filter(!is.na(value)) %>%
   ggplot(aes(
     y = name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
     fill = value %>% fct_rev() %>% fct_relevel("Ne", "Ano", after = 1)
@@ -785,11 +856,51 @@ d %>%
   guides(fill = guide_legend(reverse = T, nrow = 1, override.aes = list(size = NULL))) +
   theme_schola("x",
     legend.title = element_blank(),
-    plot.margin = unit(c(10, 6, 6 + 28, 6), "points"), # based on defaults
-    legend.position = c(.57, -.135),
-    legend.justification = "right"
+    legend.position = "top"
   )
+```
 
+
+```{r feedbackComp, include=plot_comparison, fig.cap="Vnímání pozitivního dopadu zpětné vazby na jednotlivé aspekty výuky", fig.asp = .65}
+d %>%
+  pivot_longer(s3q4_a:s3q4_f) %>%
+  filter(!is.na(value)) %>%
+  ggplot(aes(
+    y = digest,
+    fill = value %>% fct_rev() %>% fct_relevel("Ne", "Ano", after = 1),
+  )) +
+  geom_bar(
+    col = "white",
+    size = .7,
+    position = "fill",
+    width = 1
+  ) +
+  scale_fill_manual(values = c("darkgray", "#CA0020", "#0571B0"), drop = FALSE) +
+  scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
+  facet_wrap(
+    ~ name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
+    dir = "v",
+    ncol = 1,
+    labeller = schola_labeller(wrap = 115)
+  ) +
+  guides(
+    fill = guide_legend(
+      reverse = TRUE,
+      nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
+  theme_schola(
+    "x",
+    legend.title = element_blank(),
+    legend.position = "top",
+    legend.box.spacing = unit(2, "mm"),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
+    panel.spacing = unit(0, "mm"),
+    strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
+  )
 ```
 
 
@@ -800,10 +911,18 @@ d %>%
 
 Tato sekce shrnuje základní, zejména sociodemografické údaje o učitelích, kteří dotazník vyplnili. Dále zachycuje jejich pedagogické zkušenosti, délku učitelského úvazku a zprostředkovaně také motivaci k volbě povolání (viz graf č. \@ref(fig:career)). Graf č. \@ref(fig:subjects) odkazuje na skladbu vyučovaných předmětů, resp. jejich kategorií.
 
-Ředitelé odeslali pozvánku k vyplnění dotazníku celkem `r total_invited` učitelům a učitelkám.
-Z toho `r opened_count` dotazník otevřelo a `r completed` ho vyplněný odeslalo. Efektivní návratnost je tedy `r response_rate`.
+## Vaše škola
 
-Běžný počet přeskočených nepovinných položek je `r median(d$n_miss_vars)`, "únikových" voleb typu "Nevím / nechci odpovědět" pak učitelé běžně využívali `r escape_med`krát. `r length(n_escapes_outliers)` učitel/é tuto možnost volil/i mimořádně často -- nejvíce `r n_escapes_outliers[1]`krát.
+Ředitel/ka odeslal/a pozvánku k vyplnění dotazníku celkem `r total_invited` učitelkám a učitelům.
+Dotazník jich otevřelo `r opened_count` a `r completed` u nich ho vyplněný odeslalo. Návratnost z pozvaných je tedy `r response_rate_invited`, návratnost efektivní pak činí `r response_rate_effective`.
+
+```{r, results='asis', include=any_outliers}
+glue::glue("Ve Vaší škole se vyskytli respontenti s neobvyklým počtem chybějících ({n_miss_outl}) nebo \"únikových\"^[Odpovědi typu \"Nevím / Nechci uvést.\".] odpovědí ({n_esc_outl}).")
+```
+
+## Ostatní školy
+
+Dotazníkového šetření se zúčastnilo dalších `r resp_stats %>% filter(!digest) %>% pull(n_total_sum)` učitelek a učitelů z `r d %>% filter(!digest) %>% pull(red_izo) %>% n_distinct` škol. Vyplněný dotazník odeslalo `r resp_stats %>% filter(!digest) %>% pull(n_submitted_sum)` pedagogů. Efektivní návratnost tedy u ostatních škol činí `r ((resp_stats %>% filter(!digest) %>% pull(n_submitted_sum))/(resp_stats %>% filter(!digest) %>% pull(n_total_sum))) %>% scales::percent(1, suffix = "\u00A0%")`.
 
 
 
@@ -811,15 +930,24 @@ Běžný počet přeskočených nepovinných položek je `r median(d$n_miss_vars
 # only one item
 d %>%
   ggplot(aes(
-    y = red_izo %>% fct_reorder(s0q1 == "Žena", mean, .desc = TRUE),
+    y = digest,
     fill = s0q1 %>% fct_rev()
   )) +
-  geom_bar(col = "white", size = 1.1, position = "fill") +
+  geom_bar(
+    col = "white",
+    size = .7,
+    position = "fill",
+    width = 1
+  ) +
   scale_fill_manual(values = scales::hue_pal(direction = -1)(2), drop = FALSE) +
   scale_x_percent_cz() +
-  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = NULL))) +
+  scale_y_discrete(labels = c("", "*")) +
+  guides(
+    fill = guide_legend(reverse = TRUE, override.aes = list(size = NULL)),
+    alpha = guide_none()
+  ) +
   theme_schola("x",
-    legend.position = "bottom", 
+    legend.position = "top",
     legend.title = element_blank(),
     axis.text.y = element_blank()
   )
@@ -828,153 +956,183 @@ d %>%
 
 ```{r age, fig.cap = "Věk", fig.asp=.185}
 d %>%
-  ggplot(aes(s0q2,
-    y = red_izo %>% fct_reorder(s0q2, .desc = TRUE)
-  )) +
-  geom_boxplot(col = "gray40", fill = "gray75", alpha = .37, show.legend = FALSE, outlier.shape = NA) +
-  geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
-  scale_x_continuous(n.breaks = 8) +
-  labs(x = "počet let") + 
+  ggplot(aes(s0q2, digest, alpha = digest)) +
+  geom_boxplot(
+    col = "gray25", fill = "gray90", size = .35, show.legend = FALSE,
+    outlier.shape = "circle filled", outlier.alpha = .1,
+    outlier.fill = "gray25", outlier.stroke = 0
+  ) +
+  # geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
+  scale_alpha_discrete(range = c(0, 1)) +
+  labs(x = "počet let") +
   theme_schola("x", axis.text.y = element_blank(), axis.title.x = element_text())
 ```
 
 
 ```{r career, fig.asp = .235, fig.cap="Učitelská profese jako první kariérní volba"}
-dont_know_cannot_tell_items <- separate_items %>% 
-  filter(str_detect(levels, "Nevím / nedokážu")) %>% 
-  pull(item)
-
 d %>%
-  select(all_of(dont_know_cannot_tell_items)) %>%
-  pivot_longer(everything()) %>%
+  pivot_longer(s0q3) %>%
   ggplot(aes(
-    y = name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
+    y = digest,
     fill = value %>% fct_relevel("Ne", "Ano", after = 1)
   )) +
   geom_bar(position = "fill", col = "white", size = 1.1) +
-  scale_y_discrete(labels = function(x) get_labs(x, 50)) +
   scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_fill_manual(values = c("darkgray", "#CA0020", "#0571B0"), drop = FALSE) +
-  guides(fill = guide_legend(reverse = T, nrow = 1, override.aes = list(size = NULL))) +
+  guides(
+    fill = guide_legend(reverse = T, nrow = 1, override.aes = list(size = NULL)),
+    alpha = guide_none()
+  ) +
   theme_schola("x",
-    legend.position = "bottom", 
+    legend.position = "top",
     legend.title = element_blank(),
     axis.text.y = element_blank()
   )
 ```
 
 ```{r job, fig.asp=.3, fig.cap="Současné pracovní úvazky na pozici učitele"}
-job_items <- separate_items %>% filter(resp_type == "job") %>% pull(item)
-
 d %>%
-  select(all_of(job_items)) %>%
-  pivot_longer(everything()) %>%
+  pivot_longer(c(s0q4_a, s0q4_b)) %>%
   ggplot(aes(
-    y = name %>%
-      fct_reorder(value %>% str_detect("(než 90)|(-90)"), mean, .desc = TRUE),
+    y = digest,
     fill = value %>% fct_rev() %>% fct_relabel(~ str_extract(.x, "(?<=\\().*%"))
   )) + # percentage inside brackets
-  geom_bar(position = "fill", col = "white", size = 1.1) +
-  scale_y_discrete(labels = function(x) get_labs(x, 50)) +
+  geom_bar(
+    col = "white",
+    size = .7,
+    position = "fill",
+    width = 1
+  ) +
   scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_fill_schola(
     palette = "Blues", direction = 1, na_pos = "none",
     labels = function(x) str_wrap(x, width = 15)
   ) +
-  guides(fill = guide_legend(title = "podíl plného úvazku", reverse = T, nrow = 1, override.aes = list(size = NULL))) +
-  theme_schola("x",
+  guides(
+    fill = guide_legend(
+      title = "podíl plného úvazku", reverse = T, nrow = 1,
+      override.aes = list(size = NULL)
+    ),
+    alpha = guide_none()
+  ) +
+  facet_wrap(
+    ~ name %>%
+      fct_reorder(value %>% str_detect("(než 90)|(-90)"), mean, .desc = TRUE),
+    dir = "v",
+    ncol = 1,
+    labeller = schola_labeller(wrap = 115)
+  ) +
+  theme_schola(
+    "x",
     legend.title = element_blank(),
-    plot.margin = unit(c(10, 6, 6 + 38, 6), "points"), # based on defaults
-    legend.position = c(.7, -.45),
-    legend.justification = "right"
+    legend.position = "top",
+    legend.box.spacing = unit(2, "mm"),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
+    panel.spacing = unit(0, "mm"),
+    strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
   )
-
 ```
 
 
 ```{r yearsTeach, fig.asp=.3, fig.cap="Pracovní zkušenosti"}
-d %>% select(s0q5_a, s0q5_b) %>%
-  pivot_longer(everything()) %>%
+d %>%
+  pivot_longer(c(s0q5_a, s0q5_b)) %>%
   ggplot(aes(value,
-    y = name %>% fct_reorder(value, median, na.rm = T, .desc = TRUE)
+    y = name %>% fct_reorder(value, median, na.rm = TRUE),
+    alpha = digest
   )) +
-  geom_boxplot(col = "gray40", fill = "gray75", alpha = .37, show.legend = FALSE, outlier.shape = NA) +
-  geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
+  geom_boxplot(
+    col = "gray25", fill = "gray90", size = .35, show.legend = FALSE,
+    outlier.shape = "circle filled", outlier.alpha = .1,
+    outlier.fill = "gray25", outlier.stroke = 0
+  ) +
   scale_x_continuous(n.breaks = 6) +
-  labs(x = "počet let na pedagogické pozici") +
-  scale_y_discrete(labels = get_labs) +
-  theme_schola("x", axis.title.x = element_text())
+  scale_y_discrete(labels = function(x) {
+    get_labs(x, 40, labs_list = item_labs_list)
+  }) +
+  scale_alpha_discrete(range = c(0, 1)) +
+  labs(
+    x = "počet let na pedagogické pozici"
+  ) +
+  theme_schola("x") +
+  theme(
+    panel.grid.major.y = element_line(), axis.title.x = element_text(),
+    plot.caption = element_text(face = "italic")
+  )
 ```
 
 
-```{r lowerProp}
-lower_count <- length(d$s8q2_a[d$s8q2_a == 0])
-prop_lower <- percent(lower_count / length(d$s8q2_a), suffix = "\u00A0%", accuracy = 1, decimal.mark = ",")
-```
 
-Celkem `r lower_count` (tj. cca `r prop_lower`) učitelů nebo učitelek vyučuje výhradně na 2. stupni. Následující graf tedy ukazuje procento výuky na 1. stupni reportované *zbývajícími učiteli*. Bod na úrovni 75&nbsp;% znamená, že daný učitel vyučuje 75&nbsp;% času na prvním stupni a 25&nbsp;% na stupni druhém.
-
-
-```{r s8q2, fig.asp =.18, fig.cap="Podíl výuky na prvním stupni"}
-d %>% filter(s8q2_a != 0) %>% 
-  ggplot(aes(s8q2_a / 100,
-    y = red_izo %>% fct_reorder(s8q2_a, .desc = TRUE)
-  )) +
-  geom_boxplot(col = "gray40", fill = "gray75", alpha = .37, show.legend = FALSE, outlier.shape = NA) +
-  geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
+```{r s8q2, fig.asp =.18, fig.cap="Podíl výuky na druhém stupni"}
+d %>%
+  ggplot(aes(s8q2_b / 100, digest, alpha = digest)) +
+  geom_boxplot(
+    col = "gray25", fill = "gray90", size = .35, show.legend = FALSE,
+    outlier.shape = "circle filled", outlier.alpha = .1,
+    outlier.fill = "gray25", outlier.stroke = 0
+  ) +
+  # geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
   scale_x_percent_cz(limits = c(0, 1)) +
+  scale_alpha_discrete(range = c(0, 1)) +
+  theme_schola("x", axis.text.y = element_blank())
+```
+
+Z grafu výše je patrné, že většina pedagogů vyučuje buď 100% na prvním, nebo nebo 100% na druhém stupni. Po očištění dat od těchto případů vypadá situace takto:
+
+```{r s8q2Subset, fig.asp =.18, fig.cap="Podíl výuky na druhém stupni bez pedagogů vyučujících pouze na jednom stupni"}
+d %>%
+  filter(s8q2_b > 0 & s8q2_b < 100) %>%
+  ggplot(aes(s8q2_b / 100, digest, alpha = digest)) +
+  geom_boxplot(
+    col = "gray25", fill = "gray90", size = .35, show.legend = FALSE,
+    outlier.shape = "circle filled", outlier.alpha = .1,
+    outlier.fill = "gray25", outlier.stroke = 0
+  ) +
+  # geom_point(col = "gray30", position = position_jitter(), size = 1, alpha = .2, show.legend = FALSE) +
+  scale_x_percent_cz(limits = c(0, 1)) +
+  scale_alpha_discrete(range = c(0, 1)) +
   theme_schola("x", axis.text.y = element_blank())
 ```
 
 
-```{r subjects, fig.cap = "Počty pedagogů vyučujících jednotlivé kategorie předmětů", fig.asp = .55}
-# many_cats <- c(
-#   "#ac007b",
-#   "#92ca45",
-#   "#8942b5",
-#   "#edd44a",
-#   "#5088ff",
-#   "#bd6100",
-#   "#f19dff",
-#   "#ff7865",
-#   "#4a0053",
-#   "#ad82c5",
-#   "#7e0039"
-# )
-
-# d %>%
-#   pivot_longer(s8q1_a:s8q1_k) %>%
-#   filter(value == "Ano") %>%
-#   ggplot(aes(
-#     y = red_izo,
-#     fill = name
-#   )) +
-#   geom_bar(position = "fill", col = "white") +
-#   scale_x_percent_cz(limits = c(0, 1)) +
-#   scale_fill_manual(drop = FALSE, values = many_cats, labels = function(x) {
-#     get_labs(x, wrap = 20)
-#   }) +
-#   guides(fill = guide_legend(byrow = TRUE, reverse = T)) +
-#   theme_schola("x", legend.position = "bottom", legend.title = element_blank(), axis.text.y = element_blank())
-
+```{r subjects, fig.cap = "Počty pedagogů vyučujících jednotlivé kategorie předmětů", fig.asp = .99}
 
 d %>%
   pivot_longer(s8q1_a:s8q1_k) %>%
-  # filter(!is.na(value)) %>% 
+  # filter(!is.na(value)) %>%
   ggplot(aes(
-    y = name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
+    y = digest,
     fill = value %>% fct_rev() %>% fct_relevel("Nevybráno", "Ano", after = 1)
   )) +
-  geom_bar(position = "fill", col = "white", size = 1.1) +
-  scale_y_discrete(labels = function(x) get_labs(x, 40)) +
+  geom_bar(
+    col = "white",
+    size = .7,
+    position = "fill",
+    width = 1
+  ) +
+  # scale_y_discrete(labels = function(x) get_labs(x, 40)) +
   scale_x_percent_cz(limits = c(0, 1)) +
+  scale_y_discrete(labels = c("", "*")) +
   scale_fill_manual(values = c("darkgray", "#0571B0"), drop = FALSE) +
-  guides(fill = guide_legend(reverse = T, nrow = 1, override.aes = list(size = NULL))) +
-  theme_schola("x",
+  guides(
+    fill = guide_legend(reverse = T, nrow = 1, override.aes = list(size = NULL)),
+    alpha = guide_none()
+  ) +
+  facet_wrap(~ name %>% fct_reorder(value == "Ano", mean, .desc = TRUE),
+    dir = "v",
+    ncol = 1,
+    labeller = schola_labeller(wrap = 115)
+  ) +
+  theme_schola(
+    "x",
     legend.title = element_blank(),
-    plot.margin = unit(c(10, 6, 6 + 26, 6), "points"), # based on defaults
-    legend.position = c(.57, -.135),
-    legend.justification = "right"
+    legend.position = "top",
+    legend.box.spacing = unit(2, "mm"),
+    axis.text.y = element_text(size = 12, face = "bold", vjust = .615, margin = margin(0, 0, 0, 0)),
+    panel.spacing = unit(0, "mm"),
+    strip.text = element_text(vjust = 0, margin = margin(l = 1.1 * 11 / 2, b = 1.5))
   )
 ```
 
@@ -986,13 +1144,13 @@ Učitelé mají na starosti výuku různých předmětů, které vyobrazujeme v 
 
 ## Vizualizace položek dotazníku tvořících škály
 
-Škály, které jste viděli na začátku zprávy, sestávají vždy z několika položek, na které se odpovídá stejným způsobem (např. míra souhlasu). V následující příloze si můžete podrobně prohlédnout, z jakých konkrétních otázek daná škála vychází a jak na ní učitelky a učitelé ve vaší škole odpovídali.
+Škály, které jste viděli na začátku zprávy, sestávají vždy z několika položek, na které se odpovídá stejným způsobem (např. míra souhlasu). V následující příloze si můžete podrobně prohlédnout, z jakých konkrétních otázek daná škála vychází a jak na ní učitelky a učitelé ve Vaší škole odpovídali.
 
 ```{r}
 untidy_items <- function(..., .data = d) {
   expr <- rlang::expr(c(...))
   pos <- tidyselect::eval_select(expr, data = .data)
-  pos %>% names
+  pos %>% names()
 }
 
 scales_items <- list(
@@ -1012,8 +1170,10 @@ scales_items <- list(
   tot_s7q1_teach_percept = untidy_items(s7q1_a:s7q1_e)
 )
 
-scales_items %<>% tibble(scale = names(.), item = .) %>% unnest(cols = c(item)) %>% 
-  nest_by(item) %>% transmute(scale = flatten_chr(data)[1], subscale  = flatten_chr(data)[2])
+scales_items %<>% tibble(scale = names(.), item = .) %>%
+  unnest(cols = c(item)) %>%
+  nest_by(item) %>%
+  transmute(scale = flatten_chr(data)[1], subscale = flatten_chr(data)[2])
 
 # append scale and subscale membership to the main item overview
 items %<>% left_join(scales_items, by = "item")
@@ -1030,16 +1190,15 @@ appdx_items <-
   mutate(
     fig_asp = case_when(
       scale == "tot_s1q1_T3STUD" ~ .55,
-      scale == "tot_s1q1_T3STUD" ~ .51,
       scale == "tot_s1q3_T3TEAM" ~ .48,
-      scale == "tot_s1q4_weak" ~ .61,
-      scale == "tot_s2q1_T3COOP" ~ .75,
-      scale == "tot_s2q2_T3SELF" ~ .67,
-      scale == "tot_s4q3_leader" ~ .59,
-      scale == "tot_s6q1_T3WELS" ~ .51,
+      scale == "tot_s1q1_T3COOP" ~ .46,
+      scale == "tot_s1q4_weak" ~ .48,
+      scale == "tot_s2q2_T3SELF" ~ .89,
+      scale == "tot_s4q3_leader" ~ .73,
+      scale == "tot_s6q1_T3WELS" ~ .48,
       scale == "tot_s6q2_T3WLOAD" ~ .57,
-      scale == "tot_s6q4_T3JSENV" ~ .46,
-      scale == "tot_s7q1_teach_percept" ~ .52
+      scale == "tot_s6q4_T3JSENV" ~ .49,
+      scale == "tot_s7q1_teach_percept" ~ .6
     ),
     regex = case_when(
       resp_type == "agree" ~ "(?<!e)[S|s]ouhlasím",
@@ -1047,10 +1206,9 @@ appdx_items <-
       resp_type == "large_extent" ~ "(Do velké)|(Docela ano)",
       resp_type == "time" ~ "(týden)|(1-3)|(5-10)"
     ),
-    palette = if_else(resp_type == "time", "Blues", "RdYlBu")
+    palette = if_else(resp_type == "time", "Blues", "RdYlBu"),
+    legend_nrow = if_else(resp_type == "time", 2, 1)
   )
-
-                 
 ```
 
 
@@ -1062,7 +1220,8 @@ src_appdx <- pmap(
     appdx_items$items, # ..2 (another variable uses ..3 and so on)
     appdx_items$fig_asp,
     appdx_items$regex,
-    appdx_items$palette
+    appdx_items$palette,
+    appdx_items$legend_nrow
   ),
   ~ knit_expand(
     file =
@@ -1072,7 +1231,8 @@ src_appdx <- pmap(
     chunk = ..1 %>% str_remove_all("_") %>% str_c("appdx"), # chunk names MUSTN'T contain any underscores!
     regex = ..4,
     fig_asp = ..3,
-    palette = ..5
+    palette = ..5,
+    legend_nrow = ..6
   ) # you can add any number of additional template variables
 ) %>% set_names(appdx_items$scale) # pluck by item code for convenience
 
@@ -1092,6 +1252,3 @@ src_appdx %<>% map(~ if (str_detect(.x, "\\n$")) {
 opts_knit$set(fig_path = "figures")
 knitr::knit(text = unlist(src_appdx), quiet = TRUE) %>% cat()
 ```
-
-
-

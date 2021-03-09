@@ -1,0 +1,1015 @@
+---
+title: "Eduzměna -- průběžná zpráva"
+team: výzkumný tým SCHOLA EMPIRICA
+authors:
+  - "Magdaléna Klimešová^[Korespondenční autor. Kontakt: klimesova@scholaempirica.org]"
+  - Jaromír Mazák
+  - Jan Netík
+  - Aleš Vomáčka
+  - Martina Koutná
+  - Marek Havrda
+date: '`r reschola::as_czech_date(Sys.time())`'
+params:
+  anonymous: false
+output: 
+  reschola::schola_pdf:
+    keep_tex: true
+    template: templates/schola_template.tex
+    num_format: cs
+lang: cs # cs or en
+toc-title: "Obsah zprávy"
+logo: logos/scholaLogoNew # for path with _ use "`logos/schola_logo.pdf`{=latex}"
+logo_height: 12pt
+logo_client: logos/eduzmena
+logo_client_height: 25pt
+head_height: false
+abstract: Tento dokument shrnuje odpovědi ředitelů základních a středních škol na Kutnohorsku v rámci první vlny evaluačního sběru dat. Dotazník se týkal jejich profesního vzdělávání, zkušeností s vedením školy, zhodnocení klimatu a vybraných procesů ve škole a také vlastního pedagogického působení a celkové spokojenosti s prací. (V této verzi zprávy ještě chybí ředitelé tří škol, od kterých se dotazník nepodařilo v první vlně sběru získat.) 
+---
+
+```{r setup}
+library(knitr)
+opts_knit$set(eval.after = "fig.cap") # evaluate fig.caps after the relevant object exist
+knitr::opts_chunk$set(fig.asp = params$fig_asp_body, echo = FALSE, cache = FALSE)
+options(scipen = 10) # force R to show full numbers, not scientific notation
+
+library(tidyverse)
+library(scales)
+library(magrittr)
+library(here)
+library(reschola)
+library(lubridate)
+set_reschola_ggplot_fonts()
+theme_set(theme_schola())
+source("shared.R", local = TRUE) # use the environment of the source (because of Makefile)
+```
+
+```{r data}
+# complete data
+d <- read_rds(here("data-processed", "data-processed/reditele_ZS_SS_wave1.rds"))
+
+# add selection variable indicating selected school
+d %<>% mutate(digest = if_else(red_izo == params$redizo, TRUE, FALSE))
+
+# get human readable REDIZO & school name from the big database for further use
+instit_digest <- read_rds(here("data-input/institutions_ms_zs_ss.rds"))
+
+selected_school_name <- instit_digest %>%
+  filter(red_izo == params$redizo) %>%
+  distinct(across(c(red_izo, fullname, name))) %>%
+  pull(fullname) # some shortened name are useles (e.g. "základní škola"...)
+```
+
+```{r}
+number_school <- df %>% nrow
+```
+
+```{r}
+# labels
+
+item_labs_list <- list(
+"s2q0" = "Který z následujících výroků nejlépe odpovídá Vašemu zapojení do místního akčního plánu (MAP) na území, kde se nachází Vaše škola?",
+"s2q00" = "Jak hodnotíte užitečnost setkávání MAP pro rozvoj Vaší školy? Setkávání považujete za...",
+
+# Zúčastnil/a jste se během posledních 12 měsíců v rámci profesního vzdělávání zaměřeného na Vaši funkci ředitele/ředitelky některých z níže uvedených aktivit?
+"s4q1_sq001" = "Kurzy/semináře o učivu, metodách výuky a pedagogických tématech (např. posílení sociálních dovedností)",
+"s4q1_sq002" = "Kurzy/semináře zaměřené na vedení",
+"s4q1_sq003" = "Vzdělávací konference, kde učitelé, ředitelé a/nebo výzkumní pracovníci prezentují svůj výzkum nebo diskutují otázky spojené se vzděláváním",
+"s4q1_sq004" = "Sebepozorování, pozorování kolegy nebo koučing jako součást pracovního poměru",
+"s4q1_sq005" = "Zapojení do skupiny ředitelů, která vznikla za účelem profesního rozvoje svých členů",
+"s4q1_sq006" = "Čtení odborné literatury",
+"s4q1_sq007" = "Jiné",
+# "s4q1w" = "",
+
+# Nakolik souhlasíte nebo nesouhlasíte s tím, že některá z následujících skutečností představuje PŘEKÁŽKU ve Vaší účasti v profesním vzdělávání?
+"s4q2_sq001" = "Profesní vzdělávání je pro mě finančně těžko dostupné",
+"s4q2_sq002" = "Zřizovatel profesní rozvoj dostatečně nepodporuje",
+"s4q2_sq003" = "Neexistuje žádná vhodná nabídka profesního vzdělávání",
+"s4q2_sq004" = "K účasti v aktivitách profesního vzdělávání nejsem nijak motivován/a",
+
+# Jaké procento svého času jako ředitel/ka této školy věnujete v průměru za školní rok následujícím činnostem?
+"s6q1_sq001" = "Administrativní úkony a schůzky",
+"s6q1_sq002" = "Úkony a schůzky související s vedením školy",
+"s6q1_sq003" = "Činnosti a porady zaměřené na školní vzdělávací program a výuku",
+"s6q1_sq004" = "Jednání se žáky",
+"s6q1_sq005" = "Jednání s rodiči nebo zákonnými zástupci",
+"s6q1_sq006" = "Jednání se zástupci místních podniků a spolků ",
+"s6q1_sq007" = "Jiné",
+
+# Uveďte prosím, jak často jste se v uplynulých 12 měsících v této škole zabýval/a následujícími činnostmi.
+"s2q1_sq001" = "Podnikal/a jsem kroky k zajištění toho, aby se učitelé cítili zodpovědní za zdokonalování svých výukových schopností",
+"s2q1_sq002" = "Podnikal/a jsem kroky k zajištění toho, aby se učitelé cítili zodpovědní za studijní výsledky svých žáků",
+"s2q1_sq003" = "Aktivně jsem vytvářel/a takové podmínky, aby mohli učitelé ve vzájemné spolupráci vytvářet nové vyučovací postupy",
+
+# Do jaké míry následující výroky charakterizují tuto školu?
+"s1q1_sq001" = "Rodiče nebo zákonní zástupci podporují žáky v jejich výkonu",
+"s1q1_sq002" = "Rodiče nebo zákonní zástupci jsou zapojováni do školních aktivit",
+"s1q1_sq003" = "Škola spolupracuje s místní komunitou",
+
+# Jak jste celkově spokojen/a nebo nespokojen/a s podporou, kterou Vaše škola v případě potřeby dostává od následujících institucí.
+"s5q2_sq001" = "Orgán sociálně-právní ochrany dětí (OSPOD)",
+"s5q2_sq002" = "Pedagogicko-psychologické poradny (PPP)",
+"s5q2_sq003" = "Speciální pedagogická centra (SPC)",
+"s5q2_sq004" = "Střediska výchovné péče (SVP)",
+"s4q0" = "Pokud chcete, rozveďte prosím, silné a slabé stránky Vaší spolupráce s těmito institucemi.",
+
+# Do jaké míry je v současné době některá z následujících skutečností překážkou toho, aby tato škola poskytovala kvalitní výuku?
+"s5q1_sq001" = "Nedostatek kvalifikovaných učitelů",
+"s5q1_sq002" = "Nedostatek nebo nevhodnost učebních materiálů",
+"s5q1_sq003" = "Nedostatečné nebo nevhodné vybavení digitálními technologiemi pro výuku",
+"s5q1_sq004" = "Nedostatečný přístup na internet",
+"s5q1_sq005" = "Nedostatečné nebo nevhodné vybavení knihovny",
+"s5q1_sq006" = "Nedostatek podpůrného personálu",
+"s5q1_sq007" = "Nedostatek či nevhodnost prostorů k výuce",
+"s5q1_sq008" = "Nedostatek či nevhodnost materiálního vybavení",
+"s5q1_sq009" = "Nedostatek či nevhodnost potřebného vybavení k výuce odborných dovedností",
+"s5q1_sq010" = "Nedostatek času pro pedagogické vedení",
+"s5q1_sq011" = "Nedostatek času na žáky",
+"s5q1_sq012" = "Nedostatek podpory od zřizovatele",
+"s5q1_sq013" = "Nedostatek podpory od MŠMT",
+"s5q1_sq014" = "Nedostatek učitelů s kompetencí učit žáky s SVP",
+
+# Jak často v této škole dochází k následujícím situacím mezi žáky?
+"s8q2_sq001" = "Vandalství a krádeže",
+"s8q2_sq002" = "Zastrašování nebo šikana mezi žáky (nebo jiný druh verbálního napadání)",
+"s8q2_sq003" = "Fyzické zranění způsobené v důsledku násilí mezi žáky",
+"s8q2_sq004" = "Zastrašování či verbální napadání učitelů a zaměstnanců školy",
+"s8q2_sq005" = "Užívání/držení drog a/nebo alkoholu",
+"s8q2_sq006" = "Hlášení žáků nebo rodičů/zákonných zástupců, že se na internetu objevily příspěvky nebo urážlivé informace na adresu žáků",
+"s8q2_sq007" = "Hlášení žáků nebo rodičů/zákonných zástupců o nežádoucím elektronickém kontaktu mezi žáky",
+
+# Mají noví učitelé v této škole přístup k zaškolovacím aktivitám?
+"s2q2_sq001" = "Na naší škole je pro nové učitele k dispozici formální zaškolovací program",
+"s2q2_sq002" = "Na naší škole jsou pro nové učitele k dispozici neformální zaškolovací aktivity",
+
+# Které z následujících nástrojů a činností jsou v této škole součástí zaškolování učitelů?
+"s2q3_sq001" = "Prezenční kurzy/semináře",
+"s2q3_sq002" = "Online kurzy/semináře",
+"s2q3_sq003" = "Online aktivity",
+"s2q3_sq004" = "Plánované schůzky s ředitelem a/nebo zkušenými učiteli",
+"s2q3_sq005" = "Dohled ředitele a/nebo zkušených učitelů",
+"s2q3_sq006" = "Sdílení/spolupráce s jinými novými učiteli",
+"s2q3_sq007" = "Týmová výuka se zkušenějšími učiteli",
+"s2q3_sq008" = "Portfolia/deníky/diáře",
+"s2q3_sq009" = "Snížené výukové povinnosti",
+"s2q3_sq010" = "Obecné/administrativní zaškolení",
+
+"s3q1" = "Podílíte se v tomto roce aktivně na pedagogické činnosti?",
+
+# Jak často se v průměru v této škole věnujete následujícím činnostem?
+"s3q2_a" = "Vyučuji týmově společně s jinými učiteli v téže třídě",
+"s3q2_b" = "Pozoruji výuku ostatních učitelů a poskytuji jim zpětnou vazbu",
+"s3q2_c" = "Vyměňuji si učební materiály s kolegy",
+"s3q2_d" = "Probírám s kolegy studijní pokroky konkrétních žáků",
+"s3q2_e" = "Spolupracuji s ostatními učiteli v této škole s cílem zabezpečit stejné standardy při hodnocení pokroku žáků",
+"s3q2_f" = "Zapojuji se do společných aktivit napříč třídami a věkovými skupinami",
+
+"s7q3" = "Kolik let chcete ještě vykonávat práci ředitele/ředitelky školy",
+
+# Když se zamyslíte nad svou prací v této škole, do jaké míry jsou pro vás následující situace zdrojem stresu v práci?
+"s8q1_sq001" = "Příliš mnoho práce s hodnocením učitelů a následnou zpětnou vazbou",
+"s8q1_sq002" = "Příliš mnoho administrativní práce",
+"s8q1_sq003" = "Povinnosti navíc kvůli chybějícím zaměstnancům",
+"s8q1_sq004" = "Zodpovědnost za výsledky žáků",
+"s8q1_sq005" = "Udržování disciplíny ve škole",
+"s8q1_sq006" = "Zastrašování nebo slovní napadání ze strany žáků",
+"s8q1_sq007" = "Vycházení vstříc měnícím se požadavkům správních orgánů na jakékoliv úrovni veřejné správy",
+"s8q1_sq008" = "Řešení obav rodičů či zákonných zástupců",
+"s8q1_sq009" = "Vycházení vstříc potřebám žáků se speciálními potřebami",
+
+# Rádi bychom se zeptali, jak obecně nahlížíte na svou práci. Nakolik souhlasíte nebo nesouhlasíte s následujícími výroky?
+"s7q4_sq001" = "Lituji svého rozhodnutí stát se ředitelem/ředitelkou",
+"s7q4_sq002" = "Práce v této škole mě těší",
+"s7q4_sq003" = "Doporučil/a bych tuto školu jako dobré pracoviště",
+"s7q4_sq004" = "Se svým výkonem v této škole jsem spokojen/a",
+"s7q4_sq005" = "Celkově jsem ve svém zaměstnání spokojen/a",
+
+# Nakolik souhlasíte nebo nesouhlasíte s následujícími výroky?
+"s1q2_sq001" = "Jsem spokojen/a s podporou, kterou získávám od zaměstnanců této školy",
+"s1q2_sq002" = "Jsem spokojen/a s platem, který za svou práci dostávám",
+"s1q2_sq003" = "Nemohu ovlivnit rozhodnutí, která jsou pro mou práci důležitá",
+"s1q2_sq004" = "Ve škole existuje sdílená vize toho, kam se chceme posouvat",
+"s8q3" = "Kdybyste měl/a neomezené možnosti, co by byly první tři věci, které byste chtěl/a udělat pro zlepšení Vaší školy?",
+"s8q4" = "Je cokoliv dalšího, co byste chtěl/a ke svým odpovědím doplnit nebo nám vzkázat?"
+)
+
+# function, wrap arg takes integer specifying text width
+get_labs <- function(vars, wrap = NULL, labs_list = item_labs_list) {
+  out <- labs_list[c(vars)] %>% unlist
+  if (!is.null(wrap)) {out <- out %>% stringr::str_wrap(wrap)}
+  return(out)
+}
+```
+
+
+```{r}
+# demo
+sex_tab <- df %>% count(sex) %>% mutate(prop = n/sum(n))
+
+men_count <- sex_tab %>% filter(sex == "Muž") %>% pull(n)
+men_prop <- sex_tab %>% filter(sex == "Muž") %>% pull(prop) %>% scales::percent(accuracy = 0.1, suffix = " %", decimal.mark = ",")
+
+women_count <- sex_tab %>% filter(sex == "Žena") %>% pull(n)
+women_prop <- sex_tab %>% filter(sex == "Žena") %>% pull(prop) %>% scales::percent(accuracy = 0.1, suffix = " %", decimal.mark = ",")
+
+# N
+n_obs <- df %>% nrow 
+
+golden <- 1.61803398875
+```
+
+\newpage
+
+## Základní údaje
+
+Zpráva vychází z celkem `r n_obs` dotazníků vyplněných `r women_count` (tj. `r women_prop`) ředitelkami a `r men_count` (tj. `r men_prop`) řediteli základních a středních škol na Kutnohorsku. V následujících grafech (č. \@ref(fig:age), \@ref(fig:hmDur) a \@ref(fig:hmDurThisSchool)) uvádíme distribuci věku ředitelů, počtu let strávených na pozici ředitele celkem a také počet let ředitelování na dané škole. Vzhledem k malému vzorku jsou tyto proměnné členěny vždy po 5letých intervalech
+
+
+
+```{r eval=FALSE, fig.cap="Zastoupení pohlaví", include=FALSE}
+df %>% 
+  ggplot(aes(sex)) + 
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  theme_schola("y")
+
+
+h <- hist(df$age)
+cum.prob <- data.frame(value=h$mids, prob=cumsum(h$counts)/sum(h$counts))
+```
+
+Jen jeden z ředitelů je mladší 40 let. Asi 60 % ředitelů už bylo 50 let a čtvrtině již bylo 60 let. 
+
+```{r age, fig.cap = "Věk ředitelů", fig.asp=.4}
+
+df %>% ggplot(aes(cut_width(
+  age,
+  width = 5,
+  closed = "left",
+  boundary = 0
+))) +
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  scale_x_discrete(
+    labels = function(x) {
+      x %>% str_replace_all("\\[", "\u3008") %>%
+        str_replace("\\]", "\u3009") %>%
+        str_replace(",", ", ")
+    }
+  ) +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  theme_schola("y") +
+  labs(caption = "Členěno po 5letých úsecích.")
+```
+
+Asi polovina ředitelů vykonává práci ředitele do deseti let, asi polovina je na této pozici déle.
+
+```{r hmDur, fig.cap = "Počet let na pozici ředitele", fig.asp=.4}
+df %>% ggplot(aes(cut_width(
+  hm_dur,
+  width = 5,
+  closed = "left",
+  boundary = 0
+))) +
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  scale_x_discrete(
+    labels = function(x) {
+      x %>% str_replace_all("\\[", "\u3008") %>% str_replace("\\]", "\u3009") %>% str_replace(",", ", ")
+    }
+  ) +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  theme_schola("y") +
+  labs(caption = "Členěno po 5letých úsecích.")
+```
+
+V grafech č. \@ref(fig:hmDur) a \@ref(fig:hmDurThisSchool) není příliš velký rozdíl, což indikuje, že drtivá většina ředitelů má zkušenosti s výkonem ředitelské pozice pouze na jedné škole.
+
+```{r hmDurThisSchool, fig.cap = "Počet let na pozici ředitele v dané škole", fig.asp=.4}
+df %>% ggplot(aes(
+  cut_width(
+    hm_dur_this_school,
+    width = 5,
+    closed = "left",
+    boundary = 0
+  )
+)) +
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  scale_x_discrete(
+    labels = function(x) {
+      x %>%
+        str_replace_all("\\[", "\u3008") %>%
+        str_replace("\\]", "\u3009") %>%
+        str_replace(",", ", ")
+    }
+  ) +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  theme_schola("y") +
+  labs(caption = "Členěno po 5letých úsecích.")
+```
+
+\newpage
+
+## Profesní vzdělávání
+
+Následující grafy zachycují vybrané aspekty profesního vzdělávání ředitelů škol -- účast na setkáních Místního akčního plánu rozvoje vzdělávání (MAP) a jejich vnímanou užitečnost. Graf č. \@ref(fig:profEduActivities) ukazuje konkrétní aktivity profesního vzdělávání. Poslední graf v této sekci (č. \@ref(fig:obst)) se týká pohledů ředitelů na vnímané překážky v jejich účasti na profesním vzdělávání.
+
+Více než polovina ředitelů uvádí, že se setkání MAP účastní pravidelně. Je zcela výjimečné, že by se někdo neúčastnil nikdy. 
+
+```{r map, fig.cap = "Zapojení do Místního akčního plánu (MAP)", fig.asp=.3}
+df %>% ggplot(aes(s2q0)) +
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  geom_text(aes(label = scales::percent((..count..) / sum(..count..), suffix = " %", decimal.mark = ","),
+                y = ((..count..) / sum(..count..))),
+            stat = "count", hjust = -.5) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 25)) +
+  theme_schola("x") +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  coord_flip()
+```
+
+
+Z těch, kdo se setkání alespoň někdy účastní, je skoro polovina považuje pro rozvoj školy za velmi užitečná a skoro polovina za spíše užitečná. Je ojedinělé, že by některý ředitel považoval setkání za neužitečná.   
+
+```{r, fig.cap = "Užitečnost setkávání MAP pro rozvoj své školy", fig.asp=.3}
+df %>% filter(!is.na(s2q00)) %>%
+  ggplot(aes(s2q00)) +
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  geom_text(aes(label = scales::percent((..count..) / sum(..count..), suffix = " %", decimal.mark = ","),
+                y = ((..count..) / sum(..count..))),
+            stat = "count", hjust = -.5) +
+  scale_x_discrete(
+    labels = function(x) str_wrap(x, width = 30)
+  ) +
+  theme_schola("x") +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  coord_flip()
+```
+
+```{r, include=FALSE}
+# relation between the two above
+table(df$s2q0, df$s2q00)
+```
+
+U profesního vzdělávání u každé z nabízených položek poměrně velká část ředitelů deklaruje, že se jich v posledních dvanácti měsících účastnila. Kromě "zapojení do skupiny ředitelů" (a kategorie "jiné") je to vždy více než polovina ředitelů.
+
+```{r profEduActivities, fig.cap = "Aktivity v rámci profesního vzdělávání (za posledních 12 měsíců)"}
+df %>%
+  pivot_longer(s4q1_sq001:s4q1_sq007) %>% mutate(value = fct_rev(value)) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(3)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 50)) +
+  scale_fill_manual(values = c(
+    # hard-assign values to color
+    "Ano" = "#0571B0",
+    "Ne" = "#CA0020",
+    "Nevím / nechci odpovědět" = "gray"
+  )) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  guides(fill = guide_legend(reverse = T)) +
+  scale_y_percent_cz() +
+  coord_flip()
+
+```
+
+Jako pozitivní lze hodnotit, že žádnou z překážek profesního vzdělávání, na které jsme se v dotazníku zaměřili, nepovažuje za silnou mnoho ředitelů. 
+
+```{r obst, fig.cap = "Vnímané překážky v účasti na profesním vzdělávání", fig.asp=.6}
+df %>%
+  pivot_longer(s4q2_sq001:s4q2_sq004) %>%
+  mutate(value = lvls_reorder(value, c(4, 3, 1, 2, 5))) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(3:5)]^10), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 25)) +
+  scale_fill_manual(values = c("gray", RColorBrewer::brewer.pal(4, "RdBu"))) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    nrow = 2
+  )) + 
+  scale_y_percent_cz()
+```
+
+\newpage
+
+## Vedení školy
+
+Tato sekce nabízí pohled na skladbu pracovní náplně ředitele školy.
+
+
+Z grafu č. \@ref(fig:structure) je vidět, že především u některých aktivit existují mezi řediteli obrovské rozdíly. Zatímco jednání se žáky představuje pro asi polovinu ředitelů cca 10 % jejich pracovního času a jednotliví ředitelé se od sebe liší jen relativně málo, u administrativních úkonů poskytli ředitelé velmi variabilní odpovědi: Pro některé představuje administrativa do 20 % pracovního času, ale pro jiné také 50 nebo i více procent. 
+
+```{r structure, fig.cap = "Zastoupení jednotlivých činností v práci ředitele za průměrný školní rok (agregovaně)", fig.asp=.6}
+# aggregated
+work_structure <- df %>%
+  pivot_longer(s6q1_sq001:s6q1_sq007) %>%
+  mutate(name = name %>% fct_reorder(value, .fun = median, .desc = TRUE),
+         value = value / 100) %>%
+  ggplot(aes(y = name, x = value, col = name)) +
+  geom_boxplot(
+    aes(fill = name),
+    alpha = .2 ,
+    outlier.shape = NA,
+    show.legend = FALSE
+  ) +
+  geom_jitter(size = 1.15,
+              alpha = .55,
+              width = .0,
+              show.legend = FALSE) +
+  theme_schola("y") +
+  scale_x_percent_cz() +
+  scale_y_discrete(
+    labels = function(x)
+      get_labs(x, 35)
+  ) +
+  coord_cartesian(xlim = c(-.05, 1))+
+  labs(caption = "Body představují odpovědi jednotlivých ředitelů, krabicové grafy ohraničují rámečkem\n50 % prostředních odpovědí s tím, že svislá čára v nich značí medián.")
+
+work_structure
+
+temp_plot <- work_structure + labs(
+  title = "Zastoupení jednotlivých činností v práci ředitele",
+  subtitle = "za průměrný školní rok, agregovaně"
+) +
+  annotate("text", x = .97, y = 5.275, hjust = 1, vjust = 0, color = "gray30", label ="Body představují odpovědi jednotlivých ředitelů,\nkrabicové grafy ohraničují rámečkem\n50 % prostředních odpovědí s tím,\nže svislá čára v nich značí medián.") +
+theme(plot.caption = element_blank())
+
+ggsave(here("figures/publication_ready/", "struktura_prace.png"), width = 7, height = 7*.6)
+
+```
+
+
+```{r, fig.cap = "Zastoupení jednotlivých činností v práci ředitele za průměrný školní rok (po školách)", fig.asp = .75}
+# orddering schools by administrative work share (biggest cat)
+work_structure_byrow <- df %>%
+  mutate(nazev_simple = nazev_simple %>%
+           fct_reorder(s6q1_sq001, .desc = TRUE)) %>% # administrative work
+  pivot_longer(s6q1_sq001:s6q1_sq007) %>%
+  mutate(value = value / 100) %>%
+  ggplot(aes(
+    fill = name,
+    x = value,
+    y = nazev_simple,
+    group = nazev_simple
+  )) +
+  geom_col(position = "stack", colour = "white") +
+  {
+    if (params$anonymous) { # when RMarkdown param `anonymous` is true, get anonymous
+      scale_y_discrete(labels = paste("Škola č.", 1:number_school))
+    }
+  } +
+  scale_fill_discrete(labels = function(x) get_labs(x, 20)) +
+  scale_x_percent_cz() +
+  theme_schola("y", legend.title = element_blank()) +
+  guides(fill = guide_legend(
+    keywidth = 0.4,
+    keyheight = c(1, 1.5, 2, .7, 1.45, 1.5, .75),
+    # accommodating for text
+    default.unit = "cm"
+  ))
+
+work_structure_byrow
+
+
+
+temp_plot <- work_structure_byrow + labs(
+  title = "Zastoupení jednotlivých činností v práci ředitele",
+  subtitle = "za průměrný školní rok, po školách"
+)
+
+ggsave(here("figures/publication_ready/", ifelse(params$anonymous, "struktura_prace_po_skolach_anonym.png", "struktura_prace_po_skolach.png")), width = 7, height = .75*7)
+
+```
+
+Z hlediska sebehodnocení v tom, jak jsou ředitelé proaktivní v podpoře pedagogické práce učitelů, převažuje pozitivní sebehodnocení. 
+
+```{r proactive, fig.cap = "Frekvence proaktivních kroků"}
+df %>%
+  # mutate(name = fct_reorder(name, value, .fun = identity)) %>%
+  pivot_longer(s2q1_sq001:s2q1_sq003) %>% mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Nikdy nebo zřídka",
+      "Občas",
+      "Často",
+      "Velmi často"
+    )
+  )) %>%
+  ggplot(aes(
+    x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4, 5)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value
+  )) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(
+    labels = function(x)
+      get_labs(x, 35)
+  ) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(4, "Blues")),
+    drop = FALSE,
+    labels = function(x)
+      str_wrap(x, width = 40)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = TRUE,
+    ncol = 4
+  )) +
+  scale_y_percent_cz()
+```
+
+\newpage
+
+## Klima školy
+
+Sekce začíná shrnutím míry spolupráce s různými aktéry, jako jsou rodiče či zákonní zástupci, pedagogicko-psychologické poradny, OSPOD aj. Následuje přehled vnímaných překážek v poskytování kvalitní výuky a graf shrnující činnosti kolem určitých patologických jevů či problémového chování žáků.
+
+
+```{r coop, fig.cap = "Spolupráce s rodiči a zapojení do místní komunity"}
+df %>%
+  pivot_longer(
+    s1q1_sq001:s1q1_sq003) %>% mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Vůbec ne",
+      "Do určité míry",
+      "Docela ano",
+      "Do velké míry"
+    )
+)) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4, 5)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 25)) +
+  scale_fill_manual(values = c("gray", RColorBrewer::brewer.pal(4, "Blues")),
+                    drop = FALSE) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(reverse = T, byrow = T, ncol = 4)) +
+  scale_y_percent_cz()
+```
+
+V grafu č. \@ref(fig:inst) kontrastuje poměrně velká míra spokojenosti spolupráce s pedagogicko-psychologickými poradnami s nezanedbatelnou částí ředitelů, kteří jsou naopak spíše nespokojeni se spoluprací s OSPODem.
+
+```{r inst, fig.cap = "Spokojenost s podporou ze strany institucí"}
+df %>%
+  pivot_longer(s5q2_sq001:s5q2_sq004) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "S tímto typem instituce naše škola vůbec nespolupracuje",
+      "Velmi nespokojen/a",
+      "Spíše nespokojen/a",
+      "Spíše spokojen/a",
+      "Velmi spokojen/a"
+    )
+  )) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(5:6)]),
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 25)) +
+  scale_fill_manual(values = c("gray", "dimgray", RColorBrewer::brewer.pal(4, "RdBu")),
+                    drop = FALSE, labels = function(x) str_wrap(x, width = 30)) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(reverse = T, byrow = T, nrow = 2)) +
+  scale_y_percent_cz()
+```
+
+Graf č. \@ref(fig:obstacles) identifikuje, kde ředitelé nejčastěji vnímají překážky pro poskytování kvalitní výuky. Je seřazen podle součtu kategorií "do velké míry" a "docela ano". 
+
+```{r obstacles, fig.cap = "Překážky v poskytování kvalitní výuky", fig.asp = 1.2}
+obstacles <- df %>%
+  pivot_longer(s5q1_sq001:s5q1_sq014) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Vůbec ne",
+      "Do určité míry",
+      "Docela ano",
+      "Do velké míry"
+    )
+  )) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4, 5)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 40)) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(4, "Reds")),
+    drop = FALSE,
+    labels = function(x) str_wrap(x, width = 30)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    nrow = 2
+  )) +
+  scale_y_percent_cz()
+
+obstacles
+
+
+
+temp_plot <- obstacles + labs(
+  title = "Překážky v poskytování kvalitní výuky"
+)
+
+ggsave(here("figures/publication_ready/", "prekazky_v_poskytovani_kvalitni_vyuky.png"), width = 7, height = 1.2*7)
+```
+
+U nežádoucího chování, které musí ředitelé řešit, vystupují do popředí především šikana (včetně možné kyberšikany a napadání učitelů), vandalstí a krádeže. Fyzické násilí mezi žáky a užívání drog je naopak méně časté. 
+
+```{r delinq, fig.cap = "Nežádoucí chování žáků"}
+problem_behavior <- df %>%
+  pivot_longer(s8q2_sq001:s8q2_sq007) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Nikdy",
+      "Méně než jednou za měsíc",
+      "Jednou za měsíc",
+      "Jednou za týden",
+      "Denně"
+    )
+  )) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4:6)]),
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 50)) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(5, "Reds")),
+    drop = FALSE,
+    labels = function(x) str_wrap(x, width = 15)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    nrow = 2
+  )) +
+  scale_y_percent_cz()
+
+problem_behavior
+
+
+temp_plot <- problem_behavior + labs(
+  title = "Nežádoucí chování žáků"
+)
+
+ggsave(here("figures/publication_ready/", "problemove_chovani_zaku.png"), width = 7, height = 7/golden)
+```
+
+
+\newpage
+
+## Zaškolování a mentorování
+
+Sekce shrnuje dostupnost neformálních i formálních zaškolovacích aktivit, resp. programů a jejich konkrétnější podobu, případně využívané nástroje či instituty.
+
+Na polovině škol neexistuje pro nové učitele formální zaškolovací program. 
+
+```{r, fig.cap = "Dostupnost zaškolovacích aktivit", fig.asp=.34}
+df %>%
+  pivot_longer(s2q2_sq001:s2q2_sq002) %>%
+  mutate(value = value %>% fct_rev) %>%
+  ggplot(aes(x = fct_reorder(name, as.numeric(value), .desc = TRUE), fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 30)) +
+  scale_fill_manual(
+    values = RColorBrewer::brewer.pal(5, "RdBu")[c(1, 5)],
+    drop = FALSE,
+    labels = function(x)
+      str_wrap(x, width = 30)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(reverse = T)) +
+  scale_y_percent_cz()
+```
+
+Graf č. \@ref(fig:activities) ukazuje podíl škol, na kterých jsou pro začínající učitele k dispozici vybrané zaškolovací nástroje či aktivity. 
+
+```{r activities, fig.cap = "Nástroje a činnosti využívané k zaškolování nových učitelů"}
+df %>%
+  pivot_longer(s2q3_sq001:s2q3_sq010) %>% 
+  filter(s2q2_sq001 != "Ne" & s2q2_sq002 != "Ne") %>% 
+  mutate(value = fct_rev(value)) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x == 3]),
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 45)) +
+  scale_fill_manual(values = c(
+    # hard-assign values to color
+    "Ano" = "#0571B0",
+    "Ne" = "#CA0020",
+    "Nevím / nechci odpovědět" = "gray"
+  )) +
+  theme_schola("y", legend.position = "bottom", legend.title = element_blank()) +
+  guides(fill = guide_legend(reverse = T)) +
+  scale_y_percent_cz() +
+  coord_flip()
+
+```
+
+\newpage
+
+## Vlastní pedagogické působení
+
+
+```{r}
+teaching_tab <- fct_count(df$s3q1) %>% mutate(prop = n/sum(n)) %>% filter(f == "Ano")
+teaching_count <- teaching_tab %>% pull(n)
+teaching_prop <- teaching_tab %>% pull(prop) %>% scales::percent(accuracy = .1, suffix = " %", decimal.mark = ",")
+```
+
+
+V dosavadním vzorku se na pedagogické činnosti aktivně podílelo `r teaching_count` (`r teaching_prop`) ředitelů.   
+
+
+```{r teachPartic, fig.cap = "Zapojení ředitelů do výuky", fig.asp = .77}
+df %>% filter(s3q1 == "Ano") %>% 
+  pivot_longer(s3q2_a:s3q2_f) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Nikdy",
+      "Jednou za rok nebo méně často",
+      "2-4x do roka",
+      "5-10x do roka",
+      "1-3x za měsíc",
+      "Jednou za týden nebo častěji"
+    )
+  )) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(6,7)]^5), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 30)) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(6, "Blues")),
+    drop = FALSE,
+    labels = function(x)
+      str_wrap(x, width = 15)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    ncol = 3
+  )) +
+  scale_y_percent_cz()
+  
+```
+
+
+\newpage
+
+## Spokojenost s prací
+
+V poslední sekci se věnujeme spokojenosti ředitele s prací. Graf č. \@ref(fig:motiv) ukazuje, kolik let by ředitelé ještě chtěli setrvat ve své pozici. 
+
+```{r motiv, fig.cap = "Počet let, po který jsou ředitelé ochotni setrvat na své současné pracovní pozici", fig.asp=.4}
+df %>%
+  ggplot(aes(
+    cut_width(
+      s7q3,
+      width = 5,
+      closed = "left",
+      boundary = 0
+    ) %>%
+      fct_explicit_na("Neuvedeno")
+  )) +
+  geom_bar(aes(y = ..prop.., group = 1)) +
+  scale_x_discrete(
+    labels = function(x) {
+      x %>%
+        str_replace_all("\\[", "\u3008") %>%
+        str_replace("\\]", "\u3009") %>%
+        str_replace(",", ", ")
+    }
+  ) +
+  scale_y_percent_cz(limits = c(0, 1)) +
+  theme_schola("y") +
+  labs(caption = "Členěno po 5letých úsecích.")
+```
+
+Potvrzuje se, co se často ozývalo již z mapování potřeb, a sice že mezi největší zdroje stresu pro ředitele patří administrativní zátěž a také konkrétně nutnost vycházet vstříc měnícím se požadavkům správních orgánů. Možná překvapivě poměrně malým zdrojem stresu jsou aspekty týkající se udržování disciplíny. Také stojí za povšimnutí, že inkluze, resp. vycházení vstříc potřebám žáků se speciálními potřebami je výraznějším problémem jen v menšině škol.  
+
+```{r stress, fig.cap = "Vnímané zdroje pracovního stresu"}
+stressors <- df %>%
+  pivot_longer(s8q1_sq001:s8q1_sq009) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Vůbec ne",
+      "Do určité míry",
+      "Docela ano",
+      "Do velké míry"
+    )
+  )) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4:5)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 48)) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(4, "Reds")),
+    drop = FALSE,
+    labels = function(x)
+      str_wrap(x, width = 15)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    nrow = 2
+  )) +
+  scale_y_percent_cz()
+
+stressors
+
+temp_plot <- stressors + labs(
+  title = "Vnímané zdroje pracovního stresu"
+)
+
+ggsave(here("figures/publication_ready/", "pracovni_stres.png"), width = 7, height = 7/golden)
+
+
+```
+
+Dobrou zprávou je, že ředitele celkově jejich práce těší. Svého rozhodnutí stát se ředitelem nelitují. 
+
+```{r satisDir, fig.cap = "Postoje k výkonu práce ředitele na dané škole", fig.asp=.6}
+df %>%
+  pivot_longer(s7q4_sq001:s7q4_sq005) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Rozhodně nesouhlasím",
+      "Nesouhlasím",
+      "Souhlasím",
+      "Rozhodně souhlasím"
+    )
+  )) %>% 
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4, 5)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 25)) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(4, "RdBu")),
+    drop = FALSE,
+    labels = function(x)
+      str_wrap(x, width = 20)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    ncol = 4
+  )) +
+  scale_y_percent_cz()
+```
+
+Z dalších otázek týkajících se spokojenosti s prací si lze povšimnout například toho, ředitelé jsou spokojeni s podporou svých zaměstnanců a mají pocit, že v jejich školách existuje sdílená vize toho, kam se chtějí posouvat. 
+
+```{r satisOther, fig.cap = "Další otázky spokojenosti", fig.asp=.5}
+df %>%
+  pivot_longer(s1q2_sq001:s1q2_sq004) %>%
+  mutate(value = factor(
+    value,
+    levels = c(
+      "Nevím / nechci odpovědět",
+      "Rozhodně nesouhlasím",
+      "Nesouhlasím",
+      "Souhlasím",
+      "Rozhodně souhlasím"
+    )
+  )) %>%
+  ggplot(aes(x = fct_reorder(
+      name,
+      as.numeric(value),
+      .fun = function(x)
+        sum(x[x %in% c(4, 5)]), # by weighted levels 4 & 5 ("často", "velmi často")
+      .desc = T
+    ),
+    fill = value)) +
+  geom_bar(position = "fill") +
+  scale_x_discrete(labels = function(x) get_labs(x, 37)) +
+  scale_fill_manual(
+    values = c("gray", RColorBrewer::brewer.pal(4, "RdBu")),
+    drop = FALSE,
+    labels = function(x)
+      str_wrap(x, width = 15)
+  ) +
+  theme_schola("x", legend.position = "bottom", legend.title = element_blank()) +
+  coord_flip() +
+  guides(fill = guide_legend(
+    reverse = T,
+    byrow = T,
+    ncol = 4
+  )) +
+  scale_y_percent_cz()
+```
+
+
+\newpage
+
+## Interní podněty k diskusi
+
+*	Graf č. \@ref(fig:age) ukazuje, že asi čtvrtině ředitelů již bylo 60 let. Pro řadu škol tak může být relevantní úvaha o tom, kdo bude příští ředitel, což pro Eduzměnu představuje příležitost pomoct s jeho nebo její přípravou na tuto pozici.
+*	Z grafu č. \@ref(fig:map) o účastni na setkání MAP to není přímo vidět, avšak následná analýza odhaluje, že vnímaná užitečnost poněkud překvapivě nesouvisí s tím, zda daný ředitel navštěvuje MAP pravidelně, nebo příležitostně. Tři ze sedmi ředitelů, kteří se MAP účastní jen příležitostně, přesto setkání MAP označili za „velmi užitečná“. Možná tedy existuje prostor, jak některým ředitelům pomoct k častější účasti.
+*	Z grafu č. \@ref(fig:profEduActivities) o zapojení ředitelů do aktivit v rámci profesního vzdělávání je vidět, že ředitelé se poměrně výrazně zapojují do většiny dotazovaných aktivity. U "zapojení do skupiny ředitelů, která vznikla za účelem profesního rozvoje" je největší prostor pro větší participaci (za členy takové skupiny se považuje necelá polovina ředitelů). Zajímavá může být také skutečnost, že asi čtyři z pěti ředitelů uvedli, že v rámci svého profesního vzdělávání čtou odbornou literaturu. Pokud by se podařilo jich v rámci mapování nebo při jiné příležitosti zeptat, o jakou konkrétně literaturu jde, bylo by možné s tím dále pracovat (měli bychom informaci, z jakých principů ředitelé nejčastěji vycházejí).
+*	Grafu č. \@ref(fig:obst) lze vnímat jako příležitost: ředitelé nevnímají jako silné žádné z dotazovaných překážek svého profesního vzdělávání. Pokud tedy pro ředitele Eduzměna vytvoří vhodné podmínky dalšího profesního vzdělávání (pomůže jim vyčlenit si na vzdělávání čas a nabídne jim relevantní aktivity), je pravděpodobné, že ředitelé budou ochotni své zapojení alespoň vyzkoušet.
+Z grafu č. \@ref(fig:structure) je vidět, že především u některých aktivit existují mezi řediteli obrovské rozdíly. Zatímco jednání se žáky představuje pro asi polovinu ředitelů cca 10 % jejich pracovního času a jednotliví ředitelé se od sebe liší jen relativně málo, u administrativních úkonů poskytli ředitelé velmi variabilní odpovědi: Pro některé představuje administrativa do 20 % pracovního času, ale pro jiné také 50 nebo i více procent. Je otázka, zda je to dáno nějakým snadno vysledovatelným faktorem, jako je velikost školy, nebo je za rozdíly ještě něco jiného. 
+*	Z grafu č. \@ref(fig:proactive) o frekvenci proaktivních kroků, které ředitelé podnikají k tomu, aby podpořili pedagogickou práci svých učitelů, je jasné, že ředitelé o sobě mají v tomto směru poměrně vysoké mínění. To může být způsobeno jak tím, že jsou ředitelé v této oblasti motivovaní a považují ji za prioritu, což by byl žádoucí stav, tak i určitou stylizací při vyplňování dotazníku. Z hlediska evaluace to může znamenat, že sice není až tak velký prostor pro kvantitativně vyjádřený posun, nicméně lze předpokládat, že toto je typ aktivit, které ředitelé dělat chtějí (nebo minimálně vnímají, že by je dělat měli) a budou mít zájem o podporu v tom, aby je dělali co nejlépe. Pro Eduzměnu to tedy může znamenat příležitost.
+*	Z grafu č. \@ref(fig:coop) o spolupráci s rodiči je vidět, že intenzivnější zapojení rodičů do školních aktivit je spíše vzácné. Přitom z pohledu na graf č. \@ref(fig:structure) je vidět, že z hlediska časového vytížení ředitelů je objem času věnovaný na jednání s rodiči napříč školami podobný (nejčastěji kolem 10 % času).
+*	Z grafu č. \@ref(fig:inst) o spokojenosti s podporou ze strany institucí je zřejmé, že na Kutnohorsku je nějaký problém v tom, jak školy spolupracují s OSPODem. Tomu by Eduzměna měla věnovat pozornost při mapování a vyjasnit, z čeho tato nespokojenost může plynout (komunikace, nejasné kompetence, špatně nastavené procesy, lidský faktor?). Nabízí se také otázka, jestli by bylo efektivní, aby Eduzměna pomáhala zvyšovat míru spolupráce škol s SVP a SPC, nebo existuje srozumitelný důvod pro to, že řada škol s těmito institucemi vůbec nespolupracuje. (Ty, které spolupracují, jsou převážně spokojené.)
+* U nežádoucího chování žáků (graf č. \@ref(fig:delinq)) by bylo dobré nějak cíleně pracovat s šikanou a napadáním učitelů, které mohou výrazně narušovat vztahy na škole. 
+*	V sekci o vlastním pedagogickém působení ředitelů se v grafu č. \@ref(fig:teachPartic) ukazuje prostor pro rozšíření týmové výuky, pokud by o to byl zájem, nicméně vyhodnocení této otázky bude zajímavější ve chvíli, kdy bude doplněna také o odpovědi jednotlivých učitelů.
+* Pozitivním zjištěním, které plyne z grafu č.\@ref(fig:stress), je, že více než polovina ředitelů vůbec nepovažuje za zdroj stresu vycházení vstříc potřebám žáků se speciálními potřebami. A jen velmi malá část škol toto považuje za velký zdroj stresu. 
+*	V sekci týkající se spokojenosti s prací je nejprve potřeba vyzdvihnout, že ředitele jejich práce baví (graf č. \@ref(fig:satisDir)). Také  je zajímavé, že drtivá většina ředitelů nevyjadřuje nespokojenost se svým platem (graf č. \@ref(fig:satisOther)), možná navzdory stereotypním představám, které veřejnost o školství má. Je možné, že zvyšování mezd v posledních letech už přináší nějaké ovoce.
+
+
+
+

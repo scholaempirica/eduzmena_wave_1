@@ -24,7 +24,6 @@
 
 # those 2 lines propagates argument form Makefile to prevent report opening
 makefile_args <- commandArgs(trailingOnly = TRUE)
-cat("open: ", ifelse("dontOpen" %in% makefile_args, FALSE, TRUE))
 
 # -------------------------------------------------------------------------
 library(here)
@@ -38,19 +37,83 @@ source("shared.R")
 # -------------------------------------------------------------------------
 
 # for which REDIZO shlould the report be compiled?
-red_izos <- read_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds")) %>% pull(red_izo) %>% unique
+red_izos <- read_rds(here("data-processed", "ucitele_ZS_SS_wave1.rds")) %>%
+  pull(red_izo) %>%
+  unique()
 
-purrr::map(
+# iterate over all redizos, save errors in dedicated file
+purrr::walk(
   red_izos,
-  ~ compile_and_open("02_ucitele_ZS_SS.Rmd", clean = TRUE,
-    open_on_success = ifelse("dontOpen" %in% makefile_args, FALSE, TRUE), # when called from make, don't open anything regardless of anything
-    output_dir = here("reports-output", "ucitele", "pdf"),
-    output_file = paste0("02_ucitele_ZS_SS_", .x, ".pdf"),
-    params = list(
-      redizo = .x
-      # pilot = ifelse("pilot" %in% makefile_args, TRUE, FALSE),
-      # fig_asp_body = ifelse(!"pilot" %in% makefile_args, .6, .225),
-      # fig_asp_appdx = ifelse(!"pilot" %in% makefile_args, .4, .225)
+  ~ {
+    message("\n\n________________________________CURR_SCHOOL__\nREDIZO: ", .x, "\n")
+
+    result <- tryCatch(
+      {
+        rmarkdown::render("02_ucitele_ZS_SS_with_comparisons.Rmd",
+          output_dir = here("reports-output", "ucitele", "pdf"),
+          output_file = paste0("02_ucitele_ZS_SS_", .x, ".pdf"),
+          params = list(redizo = .x),
+          clean = TRUE
+        )
+      },
+      error = function(e) {
+        message(
+          "ERROR: Report compilation failed with message:\n",
+          "----------------------------------------------"
+        )
+        writeLines(
+          as.character(e),
+          here(
+            "reports-output", "ucitele", "pdf",
+            paste0("failed_", "02_ucitele_ZS_SS_", .x, ".txt")
+          )
+        )
+        message(e)
+      }
     )
-  )
+  }
 )
+
+
+# which redizos failed to compile?
+red_izos_failed <- list.files(here("reports-output", "ucitele", "pdf")) %>%
+  str_subset("failed") %>%
+  str_extract("\\d{9}")
+
+
+
+
+
+# promissing parallel solution, but prone to errors mainly due to pdfcrop
+#
+# library(doParallel)
+#
+# reports <- map(
+#   red_izos,
+#   ~ list(
+#     out_file = paste0("02_ucitele_ZS_SS_", .x, ".pdf"),
+#     out_dir = here("reports-output", "ucitele", "pdf"),
+#     params = list(redizo = .x)
+#   )
+# )
+#
+# do_reports <- function(r) {
+#   require(rmarkdown)
+#
+#   tf <- tempfile()
+#   dir.create(tf)
+#
+#   rmarkdown::render(
+#     input = "02_ucitele_ZS_SS_with_comparisons.Rmd",
+#     output_file = r$out_file,
+#     output_dir = r$out_dir,
+#     intermediates_dir = tf,
+#     params = r$params,
+#     quiet = TRUE
+#   )
+#   unlink(tf)
+# }
+#
+# registerDoParallel(cores = detectCores()) # maximal power
+#
+# foreach(r = reports, .combine = c) %dopar% do_reports(r)

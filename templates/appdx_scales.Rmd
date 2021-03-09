@@ -25,7 +25,7 @@ d %>%
     labeller = schola_labeller(wrap = 115)
   ) +
   guides(
-    fill = guide_legend(reverse = T, byrow = TRUE, nrow = {{ legend_nrow }}, override.aes = list(size = NULL)),
+    fill = guide_legend(reverse = T, byrow = TRUE, nrow = {{legend_nrow}}, override.aes = list(size = NULL)),
     alpha = guide_none()
   ) +
   theme_schola(
